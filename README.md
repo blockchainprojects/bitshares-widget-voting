@@ -11,9 +11,9 @@ Currently supported escrows:
 
 This widget can be indcluded as a simple html element, provided that the dependencies have been loaded. The following element displays the status of two worker proposals
 ```
-<div id="bitshares-widget-voting" workerid="1.14.109;1.14.108"></div>
+<div id="bitshares-widget-voting" workerid="1.14.109;1.14.80"></div>
 ```
-The property workerid is a ";"-separated string list of all desired worker proposal ids. An example with the above element can be found in [example folder](/example/bitshares-voting-widget.html). After rendering the user sees
+The property workerid is a ";"-separated string list of all desired worker proposal ids. An example with the above element can be found in [example folder](/example/bitshares-voting-widget.html). The widget is fully customizable with the included CSS file. After rendering the default CSS the user sees
 
 ![Example](/example/bitshares-voting-widget.jpg?raw=true "BitShares Widget for Voting")
 
