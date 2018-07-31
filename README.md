@@ -5,7 +5,7 @@ It displays details of the proposal (status and others) and if a known escrow se
 details of the funding is also presented.
 
 Currently supported escrows:
- - BBF
+ - BitShares Blockchain Foundation (bitshares.foundation)
 
 
 filled in.
