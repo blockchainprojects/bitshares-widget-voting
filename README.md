@@ -33,7 +33,7 @@ An example is created in the standalone folder, simply open standalone/ticker.ht
 
 The html element that enables the voting widget is
 ```
-<div id=bitshares-widget-voting workerid="1.14.109;1.14.108"></div>
+<div id="bitshares-widget-voting" workerid="1.14.109;1.14.108"></div>
 ```
 with a property workerid that tells the ticker which worker to display. Multiple workers can be separated with ";".
 
