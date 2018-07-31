@@ -15,7 +15,7 @@ This widget can be indcluded as a simple html element, provided that the depende
 ```
 The property workerid is a ";"-separated string list of all desired worker proposal ids. An example with the above element can be found in [example folder](/example/bitshares-voting-widget.html). The widget is fully customizable with the included CSS file. After rendering the default CSS the user sees
 
-![Example](/example/bitshares-voting-widget.jpg?raw=true "BitShares Widget for Voting")
+![Example](/example/bitshares-voting-widget.jpeg?raw=true "BitShares Widget for Voting")
 
 Note that the "Vote now" button is not functional, but meant as self-motivation to implement it.
 
