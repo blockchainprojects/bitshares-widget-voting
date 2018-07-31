@@ -7,9 +7,6 @@ details of the funding is also presented.
 Currently supported escrows:
  - BitShares Blockchain Foundation (bitshares.foundation)
 
-
-filled in.
-
 ## Build Setup
 
 ``` bash
