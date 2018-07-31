@@ -7,6 +7,18 @@ details of the funding is also presented.
 Currently supported escrows:
  - BitShares Blockchain Foundation (bitshares.foundation)
 
+## Usage
+
+This widget can be indcluded as a simple html element, provided that the dependencies have been loaded. The following element displays the status of two worker proposals
+```
+<div id="bitshares-widget-voting" workerid="1.14.109;1.14.108"></div>
+```
+The property workerid is a ";"-separated string list of all desired worker proposal ids. An example with the above element can be found in [example folder](/example/bitshares-voting-widget.html). After rendering the user sees
+
+![Example](/example/bitshares-voting-widget.jpg?raw=true "BitShares Widget for Voting")
+
+Note that the "Vote now" button is not functional, but meant as self-motivation to implement it.
+
 ## Build Setup
 
 ``` bash
@@ -31,9 +43,4 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
 The usage of the voting widget can be seen in index.html. An external script will be loaded which allows the Vue component to be rendered.
 An example is created in the standalone folder, simply open standalone/ticker.html in any browser (tested with firefox and chromium).
 
-The html element that enables the voting widget is
-```
-<div id="bitshares-widget-voting" workerid="1.14.109;1.14.108"></div>
-```
-with a property workerid that tells the ticker which worker to display. Multiple workers can be separated with ";".
 
