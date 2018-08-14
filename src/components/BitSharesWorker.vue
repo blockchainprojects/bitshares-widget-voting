@@ -140,7 +140,7 @@ export default {
                                 window.btscompanion.requestSignature(
                                     {
                                         op_type: "account_update",
-                                        op_data: tr.operations[0][1]
+                                        op_data: updateObject
                                     }
                                 ).then((result) => {
                                     console.log(result);
@@ -149,7 +149,9 @@ export default {
                         } else {
                             // already voted on
                         }
-                    });
+                    }).catch((err) => {
+                        console.log(err);
+                    })
                 }
             })
         }
