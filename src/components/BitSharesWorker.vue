@@ -20,33 +20,43 @@
       Votes: {{ Math.round(worker.total_votes_for / 100000).toLocaleString() }} BTS
     </div>
     <div class="vote-button">
-      <button>Vote now</button>
+      <button v-on:click="vote">Vote now</button>
     </div>
   </div>
 </template>
 
 <script>
-  export default {
+import holder from '../../lib/bitshares-companion-js/main'
+import {ChainStore, FetchChainObjects, TransactionBuilder, FetchChain} from 'bitsharesjs/es'
+
+export default {
     name: 'BitSharesWorker',
     props: ['worker'],
     data () {
-      return {
-        starts_in: null,
-        ends_in: null,
-        current_in_USD: null,
-        asked_in_USD: null,
-        receives: null,
-        loading: true
+        return {
+            starts_in: null,
+            ends_in: null,
+            current_in_USD: null,
+            asked_in_USD: null,
+            receives: null,
+            loading: true,
+
+            // libs
+            holder: holder,
+            ChainStore: ChainStore,
+            TransactionBuilder: TransactionBuilder,
+            FetchChainObjects: FetchChainObjects,
+            FetchChain: FetchChain
     }
     },
     created: function () {
-      this.initialize()
+        this.initialize()
     },
     methods: {
-      /**
-       * connection to bitshares via bitsharesjs
-       */
-      initialize: function () {
+        /**
+        * connection to bitshares via bitsharesjs
+        */
+        initialize: function () {
         let worker = this.worker;
 
         let one_day = 1000*60*60*24;
@@ -66,9 +76,9 @@
             })
           }).then(response => {
             response.json().then((json) => {
-              thiz.current_in_USD = json[0].amounts.currency.total_max;
-              thiz.asked_in_USD = json[0].amounts.currency.asked;
-              thiz.receives = json[0].worker.receives;
+              thiz.current_in_USD = json.amounts.currency.total_max;
+              thiz.asked_in_USD = json.amounts.currency.asked;
+              thiz.receives = json.worker.receives;
               loadingDone();
             }).catch((err) => {
               // could not load escrow details
@@ -84,12 +94,67 @@
           loadingDone();
         }
 
-      },
-      loadingDone: function() {
-        this.loading = false;
-      }
+        },
+        loadingDone: function() {
+            this.loading = false;
+        },
+        vote: function (event) {
+            let thiz = this;
+            this.holder.btscompanion.connect('BitShares Voting Widget').then(connected => {
+                if (connected) {
+                    // build voting transaction
+                    let updateObject = {account: window.btscompanion.identity.id};
+
+                    FetchChain("getAccount", window.btscompanion.identity.id, undefined, {
+                        [window.btscompanion.identity.id]: true
+                    }).then((account) => {
+                        account = account.toJS()
+
+                        if (account.options.votes.indexOf(thiz.worker.vote_for) == -1) {
+                            let new_options = account.options;
+                            new_options.votes.push(thiz.worker.vote_for)
+                            new_options.votes = new_options.votes.sort((a, b) => {
+                                let a_split = a.split(":");
+                                let b_split = b.split(":");
+
+                                return (
+                                    parseInt(a_split[1], 10) - parseInt(b_split[1], 10)
+                                );
+                            });
+
+                            updateObject.new_options = new_options;
+                            // Set fee asset
+                            updateObject.fee = {
+                                amount: 0,
+                                asset_id: "1.3.0"
+                            };
+
+                            let tr = new TransactionBuilder();
+                            tr.add_type_operation("account_update", updateObject);
+
+                            Promise.all([
+                                tr.set_required_fees(),
+                                tr.update_head_block()
+                            ]).then(() => {
+                                console.log("requesting signature for", tr.operations);
+                                window.btscompanion.requestSignature(
+                                    {
+                                        op_type: "account_update",
+                                        op_data: tr.operations[0][1]
+                                    }
+                                ).then((result) => {
+                                    console.log(result);
+                                });
+                            });
+                        } else {
+                            // already voted on
+                        }
+                    });
+                }
+            })
+        }
     }
-  }
+}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
