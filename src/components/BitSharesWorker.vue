@@ -19,14 +19,19 @@
     <div class="votes">
       Votes: {{ Math.round(worker.total_votes_for / 100000).toLocaleString() }} BTS
     </div>
-    <div class="vote-button">
-      <button v-on:click="vote">Vote now</button>
+    <div class="voting">
+      <div v-if="voted">
+          <div class="done">{{votingMessage}} &#10004;</div>
+      </div>
+      <div v-else>
+          <button class="button" v-on:click="vote">Vote now</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import holder from '../../lib/bitshares-companion-js/main'
+import holder from '../lib/bitshares-companion-js/main'
 import {ChainStore, FetchChainObjects, TransactionBuilder, FetchChain} from 'bitsharesjs/es'
 
 export default {
@@ -40,6 +45,9 @@ export default {
             asked_in_USD: null,
             receives: null,
             loading: true,
+
+            votingMessage: null,
+            voted: false,
 
             // libs
             holder: holder,
@@ -111,43 +119,57 @@ export default {
                         account = account.toJS()
 
                         if (account.options.votes.indexOf(thiz.worker.vote_for) == -1) {
-                            let new_options = account.options;
-                            new_options.votes.push(thiz.worker.vote_for)
-                            new_options.votes = new_options.votes.sort((a, b) => {
-                                let a_split = a.split(":");
-                                let b_split = b.split(":");
 
-                                return (
-                                    parseInt(a_split[1], 10) - parseInt(b_split[1], 10)
-                                );
+                            window.btscompanion.voteFor(
+                                {
+                                    id: thiz.worker.id
+                                }
+                            ).then((result) => {
+                                thiz.votingMessage = "Voted";
+                                thiz.voted = true;
+                                console.log(result);
+                            }).catch((err) => {
+                                thiz.votingMessage = "Voting failed";
+                                thiz.voted = false;
+                                console.log(err);
                             });
-
-                            updateObject.new_options = new_options;
-                            // Set fee asset
-                            updateObject.fee = {
-                                amount: 0,
-                                asset_id: "1.3.0"
-                            };
-
-                            let tr = new TransactionBuilder();
-                            tr.add_type_operation("account_update", updateObject);
-
-                            Promise.all([
-                                tr.set_required_fees(),
-                                tr.update_head_block()
-                            ]).then(() => {
-                                console.log("requesting signature for", tr.operations);
-                                window.btscompanion.requestSignature(
-                                    {
-                                        op_type: "account_update",
-                                        op_data: updateObject
-                                    }
-                                ).then((result) => {
-                                    console.log(result);
-                                });
-                            });
+//
+//                            let new_options = account.options;
+//                            new_options.votes.push(thiz.worker.vote_for)
+//                            new_options.votes = new_options.votes.sort((a, b) => {
+//                                let a_split = a.split(":");
+//                                let b_split = b.split(":");
+//
+//                                return (
+//                                    parseInt(a_split[1], 10) - parseInt(b_split[1], 10)
+//                                );
+//                            });
+//
+//                            updateObject.new_options = new_options;
+//                            // Set fee asset
+//                            updateObject.fee = {
+//                                amount: 0,
+//                                asset_id: "1.3.0"
+//                            };
+//
+//                            window.btscompanion.requestSignature(
+//                                {
+//                                    op_type: "account_update",
+//                                    op_data: updateObject
+//                                }
+//                            ).then((result) => {
+//                                thiz.votingMessage = "Voted";
+//                                thiz.voted = true;
+//                                console.log(result);
+//                            }).catch((err) => {
+//                                thiz.votingMessage = "Voting failed";
+//                                thiz.voted = false;
+//                                console.log(err);
+//                            })
                         } else {
                             // already voted on
+                            thiz.votingMessage = "Already voted";
+                            thiz.voted = true;
                         }
                     }).catch((err) => {
                         console.log(err);
@@ -169,6 +191,7 @@ export default {
     padding: 7px 5px 2px 0px;
     margin-right: 5px;
     margin-left: 5px;
+    height: 110px
   }
 
   .worker h3
@@ -198,16 +221,21 @@ export default {
     font-size:0.7em;
   }
 
-  .worker .vote-button
+  .worker .voting
   {
-    float: right;
+      font-size:0.7em;
+      margin-bottom: 0.5em;
+      float: right;
   }
 
-  .worker .vote-button button
+  .worker .voting .done
+  {
+      padding-top: 0.7em;
+  }
+
+  .worker .voting .button
   {
     border-radius: 15px;
-    font-size:0.7em;
     box-shadow: 0px 2px 5px rgba(25, 25, 25, 0.27);
-    margin-bottom: 0.5em;
   }
 </style>

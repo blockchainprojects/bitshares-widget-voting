@@ -153,6 +153,7 @@ export default {
     width: 250px;
     background-color: #33A3F1;
     font-size: 10px;
+    font-color: #ffffff;
     border-radius: 50px 50px 50px 50px;
     margin-bottom: 0px;
     padding: 1px;
