@@ -42,6 +42,13 @@ module.exports = {"_args":[["bigi@1.4.2","/home/schiessl/Projekte/BlockchainProj
 
 /***/ }),
 
+/***/ "4nVA":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "7Otq":
 /***/ (function(module, exports) {
 
@@ -49,7 +56,14 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAYAAABr
 
 /***/ }),
 
-/***/ "HW3b":
+/***/ "EKez":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
+/***/ "J87E":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
@@ -65,6 +79,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // EXTERNAL MODULE: ./node_modules/vue/dist/vue.esm.js
 var vue_esm = __webpack_require__("7+uW");
 
+// EXTERNAL MODULE: ./node_modules/v-tooltip/dist/v-tooltip.esm.js
+var v_tooltip_esm = __webpack_require__("VN6J");
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/core-js/promise.js
+var promise = __webpack_require__("//Fk");
+var promise_default = /*#__PURE__*/__webpack_require__.n(promise);
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/classCallCheck.js
+var classCallCheck = __webpack_require__("Zrlr");
+var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/createClass.js
+var createClass = __webpack_require__("wxAW");
+var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
+
 // EXTERNAL MODULE: ./node_modules/bitsharesjs-ws/cjs/index.js
 var cjs = __webpack_require__("B9kd");
 var cjs_default = /*#__PURE__*/__webpack_require__.n(cjs);
@@ -72,6 +101,71 @@ var cjs_default = /*#__PURE__*/__webpack_require__.n(cjs);
 // EXTERNAL MODULE: ./node_modules/bitsharesjs/es/index.js + 7 modules
 var es = __webpack_require__("0xiO");
 
+// CONCATENATED MODULE: ./src/chain.js
+
+
+
+
+
+
+var chain_Blockchain = function () {
+    function Blockchain() {
+        classCallCheck_default()(this, Blockchain);
+
+        this._nodes = ["wss://eu.nodes.bitshares.ws", "wss://us.nodes.bitshares.ws", "wss://sg.nodes.bitshares.ws", "wss://japan.bitshares.apasia.tech/ws"];
+        this._apiInstance = null;
+    }
+
+    createClass_default()(Blockchain, [{
+        key: 'connect',
+        value: function connect() {
+            var _this = this;
+
+            return new promise_default.a(function (resolve, reject) {
+                _this._connect(null, resolve, reject);
+            });
+        }
+    }, {
+        key: '_connect',
+        value: function _connect() {
+            var idx = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            var _this2 = this;
+
+            var resolve = arguments[1];
+            var reject = arguments[2];
+
+            if (idx == null) {
+                idx = 0;
+            }
+            // one is selected now, should probably be randomized
+            this._apiInstance = cjs["Apis"].instance(this._nodes[idx], true);
+            this._apiInstance.init_promise.then(function () {
+                es["a" /* ChainStore */].init().then(function () {
+                    // fetch now for quicker cashing
+                    es["a" /* ChainStore */].fetchObject('2.1.0');
+                    resolve();
+                });
+            }).catch(function (err) {
+                idx = idx + 1;
+                if (idx > _this2._nodes.length - 1) {
+                    reject(err);
+                }
+                _this2._apiInstance.close().then(function () {
+                    _this2._apiInstance = null;
+                    _this2._connect(idx);
+                });
+            });
+        }
+    }, {
+        key: 'db_exec',
+        value: function db_exec(callName, argumentsList) {
+            return this._apiInstance._db.exec(callName, argumentsList);
+        }
+    }]);
+
+    return Blockchain;
+}();
 // EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/defineProperty.js
 var defineProperty = __webpack_require__("bOdI");
 var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty);
@@ -84,21 +178,9 @@ var assign_default = /*#__PURE__*/__webpack_require__.n(object_assign);
 var regenerator = __webpack_require__("Xxa5");
 var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
 
-// EXTERNAL MODULE: ./node_modules/babel-runtime/core-js/promise.js
-var promise = __webpack_require__("//Fk");
-var promise_default = /*#__PURE__*/__webpack_require__.n(promise);
-
 // EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/asyncToGenerator.js
 var asyncToGenerator = __webpack_require__("exGp");
 var asyncToGenerator_default = /*#__PURE__*/__webpack_require__.n(asyncToGenerator);
-
-// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/classCallCheck.js
-var classCallCheck = __webpack_require__("Zrlr");
-var classCallCheck_default = /*#__PURE__*/__webpack_require__.n(classCallCheck);
-
-// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/createClass.js
-var createClass = __webpack_require__("wxAW");
-var createClass_default = /*#__PURE__*/__webpack_require__.n(createClass);
 
 // EXTERNAL MODULE: ./node_modules/socket.io-client/lib/index.js
 var lib = __webpack_require__("DmT9");
@@ -108,7 +190,7 @@ var lib_default = /*#__PURE__*/__webpack_require__.n(lib);
 var helpers_typeof = __webpack_require__("pFYg");
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
 
-// CONCATENATED MODULE: ./src/lib/bitshares-companion-js/lib/CompanionClient.js
+// CONCATENATED MODULE: ./src/lib/beet-js/lib/CompanionClient.js
 
 
 
@@ -439,7 +521,7 @@ var CompanionClient_CompanionClient = function () {
 var fetch_npm_browserify = __webpack_require__("j9g7");
 var fetch_npm_browserify_default = /*#__PURE__*/__webpack_require__.n(fetch_npm_browserify);
 
-// CONCATENATED MODULE: ./src/lib/bitshares-companion-js/main.js
+// CONCATENATED MODULE: ./src/lib/beet-js/main.js
 
 
 
@@ -825,14 +907,14 @@ if (typeof window !== 'undefined') window.btscompanion = holder.btscompanion;
         }
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-42b46488","hasScoped":true,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWorker.vue
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-51faaa6e","hasScoped":true,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWorker.vue
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (!_vm.loading)?_c('div',{staticClass:"worker"},[_c('h3',[_vm._v("Worker: "+_vm._s(_vm.worker.id)+" - "+_vm._s(_vm.worker.name))]),_vm._v(" "),(_vm.receives)?_c('div',{staticClass:"status"},[(_vm.receives.daily.float > 0)?_c('div',[_vm._v("Status: Active")]):_c('div',[_vm._v("Status: Inactive")])]):_c('div',{staticClass:"status"},[_c('div',[_vm._v("Status: Unknown")])]),_vm._v(" "),_c('div',{staticClass:"time"},[(_vm.starts_in >= 0)?_c('div',[_vm._v("Starts in: "+_vm._s(_vm.starts_in)+" days")]):_vm._e(),_vm._v(" "),(_vm.starts_in < 0)?_c('div',[_vm._v("Ends in: "+_vm._s(_vm.ends_in)+" days")]):_vm._e()]),_vm._v(" "),_c('div',{staticClass:"funding"},[(_vm.current_in_USD)?_c('div',[_vm._v("Funds: "+_vm._s(Math.round(_vm.current_in_USD.float).toLocaleString())+" / "+_vm._s(Math.round(_vm.asked_in_USD.float).toLocaleString())+" (USD)")]):_c('div',[_vm._v("Funds: Worker account "),_c('a',{attrs:{"href":'http://bitshares-explorer.io/#/accounts/' + _vm.worker.worker_account}},[_vm._v(_vm._s(_vm.worker.worker_account))])])]),_vm._v(" "),_c('div',{staticClass:"votes"},[_vm._v("\n    Votes: "+_vm._s(Math.round(_vm.worker.total_votes_for / 100000).toLocaleString())+" BTS\n  ")]),_vm._v(" "),_c('div',{staticClass:"voting"},[(_vm.voted)?_c('div',[_c('div',{staticClass:"done"},[_vm._v(_vm._s(_vm.votingMessage)+" ✔")])]):_c('div',[_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")])])])]):_vm._e()}
 var staticRenderFns = []
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ var components_BitSharesWorker = (esExports);
 // CONCATENATED MODULE: ./src/components/BitSharesWorker.vue
 function injectStyle (ssrContext) {
-  __webpack_require__("HW3b")
+  __webpack_require__("EKez")
 }
 var normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -844,7 +926,7 @@ var __vue_template_functional__ = false
 /* styles */
 var __vue_styles__ = injectStyle
 /* scopeId */
-var __vue_scopeId__ = "data-v-42b46488"
+var __vue_scopeId__ = "data-v-51faaa6e"
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
@@ -857,6 +939,82 @@ var Component = normalizeComponent(
 )
 
 /* harmony default export */ var src_components_BitSharesWorker = (Component.exports);
+
+// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/AbstractBitSharesWidget.vue
+//
+//
+//
+//
+//
+
+
+
+
+
+
+/* harmony default export */ var AbstractBitSharesWidget = ({
+    name: 'AbstractBitSharesWidget',
+    props: [],
+    data: function data() {
+        return {
+            holder: main,
+            chain: new chain_Blockchain()
+        };
+    },
+
+    created: function created() {
+        this.connectToChainAndStart();
+    },
+    methods: {
+        /**
+         * connection to bitshares via bitsharesjs
+         */
+        connectToChainAndStart: function connectToChainAndStart() {
+            var _this = this;
+
+            // connection and then the ChainStore is initialized
+            this.chain.connect().then(function () {
+                console.log("Connected and synced");
+                // resolve the markets props (call will start fetching, unsure how the fetching can be resolved exactly)
+                _this.connected();
+            }).catch(function (err) {
+                console.log("Connection attempt failed");
+            });
+        }
+    }
+});
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-24ee76bc","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidget.vue
+var AbstractBitSharesWidget_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"widget-voting"})}
+var AbstractBitSharesWidget_staticRenderFns = []
+var AbstractBitSharesWidget_esExports = { render: AbstractBitSharesWidget_render, staticRenderFns: AbstractBitSharesWidget_staticRenderFns }
+/* harmony default export */ var components_AbstractBitSharesWidget = (AbstractBitSharesWidget_esExports);
+// CONCATENATED MODULE: ./src/components/AbstractBitSharesWidget.vue
+function AbstractBitSharesWidget_injectStyle (ssrContext) {
+  __webpack_require__("J87E")
+}
+var AbstractBitSharesWidget_normalizeComponent = __webpack_require__("VU/8")
+/* script */
+
+/* template */
+
+/* template functional */
+var AbstractBitSharesWidget___vue_template_functional__ = false
+/* styles */
+var AbstractBitSharesWidget___vue_styles__ = AbstractBitSharesWidget_injectStyle
+/* scopeId */
+var AbstractBitSharesWidget___vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var AbstractBitSharesWidget___vue_module_identifier__ = null
+var AbstractBitSharesWidget_Component = AbstractBitSharesWidget_normalizeComponent(
+  AbstractBitSharesWidget,
+  components_AbstractBitSharesWidget,
+  AbstractBitSharesWidget___vue_template_functional__,
+  AbstractBitSharesWidget___vue_styles__,
+  AbstractBitSharesWidget___vue_scopeId__,
+  AbstractBitSharesWidget___vue_module_identifier__
+)
+
+/* harmony default export */ var src_components_AbstractBitSharesWidget = (AbstractBitSharesWidget_Component.exports);
 
 // CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/BitSharesWidgetVoting.vue
 //
@@ -876,143 +1034,139 @@ var Component = normalizeComponent(
 //
 //
 //
+//
+//
+//
+//
+
 
 
 
 
 
 /* harmony default export */ var BitSharesWidgetVoting = ({
-  name: 'BitSharesWidgetVoting',
-  props: ['workerid'],
-  components: {
-    BitSharesWorker: src_components_BitSharesWorker
-  },
-  data: function data() {
-    return {
-      loadingMessage: "Loading ...",
-
-      errorMessage: null,
-
-      // the time that will be displayed
-      currentTime: this.getFormattedTime(),
-
-      workerIdList: [],
-
-      workerList: [],
-
-      // tooltip that is displayed on hover
-      tooltipMessage: "",
-
-      // BitShares specific connection
-      connector: cjs["Apis"].instance,
-      api: cjs["GrapheneApi"],
-      store: es["a" /* ChainStore */],
-      FetchChainObjects: es["c" /* FetchChainObjects */]
-    };
-  },
-
-  created: function created() {
-    this.connectToChainAndStart();
-  },
-  methods: {
-    /**
-     * connection to bitshares via bitsharesjs
-     */
-    connectToChainAndStart: function connectToChainAndStart() {
-      var _this = this;
-
-      // connection and then the ChainStore is initialized
-
-      // one is selected now, should probably be randomized
-      this.connector('wss://eu.nodes.bitshares.ws', true).init_promise.then(function (res) {
-        _this.store.init().then(function (res) {
-          // fetch now for quicker cashing
-          _this.store.fetchObject('2.1.0');
-
-          // this.store.getObject(this.workerIdList[0]);
-
-          // resolve the markets props (call will start fetching, unsure how the fetching can be resolved exactly)
-          _this.resolveWorker();
-          // tell user
-          console.log('Connected and cache initialized');
-          // start continous updates
-          setTimeout(_this.update, 500);
-          setInterval(_this.update, 5000);
-        });
-      });
+    name: 'BitSharesWidgetVoting',
+    props: ['workerid', 'witnessid', 'layout'],
+    extends: src_components_AbstractBitSharesWidget,
+    components: {
+        BitSharesWorker: src_components_BitSharesWorker
     },
-    /**
-     * expected syntax in markets props:
-     *    asset1/asset2;asset3/asset4;....
-     *
-     * should only be called once
-     */
-    resolveWorker: function resolveWorker() {
-      if (typeof this.workerid === 'string') {
-        this.workerIdList = this.workerid.split(";");
-      }
-      if (this.workerIdList.length == 0) {
-        // fallback market
-        this.workerIdList = ['1.14.103'];
-      }
+    data: function data() {
+        return {
+            loadingMessage: "Loading ...",
+
+            errorMessage: null,
+
+            // the time that will be displayed
+            currentTime: this.getFormattedTime(),
+
+            workerIdList: [],
+            workerList: [],
+
+            witnessIdList: [],
+
+            // tooltip that is displayed on hover
+            tooltipMessage: "",
+
+            // BitShares specific connection
+            chain: new chain_Blockchain(),
+
+            store: es["a" /* ChainStore */],
+            FetchChainObjects: es["c" /* FetchChainObjects */]
+        };
     },
-    /**
-     * general information about the blockchain
-     * @returns {*}
-     */
-    getHeadMessage: function getHeadMessage() {
-      try {
-        return 'Head/Timestamp=' + this.store.getObject('2.1.0').get('head_block_number') + '/' + this.store.getObject('2.1.0').get('time');
-      } catch (err) {
-        return 'Initializing ...';
-      }
-    },
-    /**
-     * formats current time human readable
-     */
-    getFormattedTime: function getFormattedTime() {
-      var currentDate = new Date();
-      return currentDate.getHours() + ':' + ('0' + currentDate.getMinutes()).slice(-2);
-    },
-    /**
-     * Loads the next message and displays it, also updates the tooltip
-     */
-    update: function update() {
-      var _this2 = this;
 
-      this.tooltipMessage = this.getHeadMessage();
+    methods: {
+        connected: function connected() {
+            console.log(this.layout);
+            this.resolveWorker();
 
-      var workerList = [];
+            // start continous updates
+            setTimeout(this.update, 500);
+            setInterval(this.update, 5000);
+        },
+        /**
+         * Resolve all configured voters
+         */
+        resolveWitness: function resolveWitness() {
+            if (typeof this.witnessid === 'string') {
+                this.witnessIdList = this.witnessid.split(";");
+            }
+            if (this.witnessIdList.length == 0) {
+                this.witnessIdList = ['1.2.711128'];
+            }
+        },
+        /**
+         * expected syntax in markets props:
+         *    asset1/asset2;asset3/asset4;....
+         *
+         * should only be called once
+         */
+        resolveWorker: function resolveWorker() {
+            if (typeof this.workerid === 'string') {
+                this.workerIdList = this.workerid.split(";");
+            }
+            if (this.workerIdList.length == 0) {
+                this.workerIdList = ['1.14.103'];
+            }
+        },
+        /**
+         * general information about the blockchain
+         * @returns {*}
+         */
+        getHeadMessage: function getHeadMessage() {
+            try {
+                return 'Head/Timestamp=' + this.store.getObject('2.1.0').get('head_block_number') + '/' + this.store.getObject('2.1.0').get('time');
+            } catch (err) {
+                return 'Initializing ...';
+            }
+        },
+        /**
+         * formats current time human readable
+         */
+        getFormattedTime: function getFormattedTime() {
+            var currentDate = new Date();
+            return currentDate.getHours() + ':' + ('0' + currentDate.getMinutes()).slice(-2);
+        },
+        /**
+         * Loads the next message and displays it, also updates the tooltip
+         */
+        update: function update() {
+            var _this = this;
 
-      this.connector()._db.exec('get_objects', [this.workerIdList]).then(function (workers, index) {
-        workers.forEach(function (worker) {
-          workerList.push(worker);
-        });
-        _this2.loadingMessage = null;
-        _this2.workerList = workerList;
-      });
+            this.tooltipMessage = this.getHeadMessage();
 
-      //      let worker = this.store.getObject(this.workerIdList[0]);
-      //      console.log(worker);
-      //
-      //      Promise.all([
-      //        this.FetchChainObjects(this.store.getObjectByVoteID, this.workerIdList, this.workerIdList.length)
-      //      ]).then(res => {
-      //        console.log(res)
-      //      }).catch((err) => {
-      //        this.errorMessage = err;
-      //      });
+            var workerList = [];
+
+            this.chain.db_exec('get_objects', [this.workerIdList]).then(function (workers, index) {
+                workers.forEach(function (worker) {
+                    workerList.push(worker);
+                });
+                _this.loadingMessage = null;
+                _this.workerList = workerList;
+            });
+
+            //      let worker = this.store.getObject(this.workerIdList[0]);
+            //      console.log(worker);
+            //
+            //      Promise.all([
+            //        this.FetchChainObjects(this.store.getObjectByVoteID, this.workerIdList, this.workerIdList.length)
+            //      ]).then(res => {
+            //        console.log(res)
+            //      }).catch((err) => {
+            //        this.errorMessage = err;
+            //      });
+        }
     }
-  }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-5933be77","hasScoped":true,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetVoting.vue
-var BitSharesWidgetVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"widget-voting"},[_c('div',{staticClass:"tooltip"},[_c('h2',[_vm._v("BitShares Widget for Voting")]),_c('span',{staticClass:"tooltip-content"},[_c('table',[_c('tbody',[_c('tr',[_c('td',{attrs:{"colspan":"2"}},[_vm._v(_vm._s(_vm.tooltipMessage))])]),_vm._m(0,false,false)])])])]),_vm._v(" "),_c('br'),_vm._v(" "),(_vm.loadingMessage)?_c('div',{staticClass:"loading-message"},[_vm._v(_vm._s(_vm.loadingMessage))]):_c('div',{staticClass:"content"},_vm._l((_vm.workerList),function(worker,index){return _c('div',{staticClass:"content"},[_c('BitSharesWorker',{attrs:{"worker":worker}})],1)}))])}
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-3c2bf420","hasScoped":true,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetVoting.vue
+var BitSharesWidgetVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"widget-voting"},[(_vm.workerIdList)?_c('div',[_c('div',{staticClass:"tooltip"},[_c('h2',[_vm._v("BitShares Widget for Voting")]),_c('span',{staticClass:"tooltip-content"},[_c('table',[_c('tbody',[_c('tr',[_c('td',{attrs:{"colspan":"2"}},[_vm._v(_vm._s(_vm.tooltipMessage))])]),_vm._m(0,false,false)])])])]),_vm._v(" "),_c('br'),_vm._v(" "),(_vm.loadingMessage)?_c('div',{staticClass:"loading-message"},[_vm._v(_vm._s(_vm.loadingMessage))]):_c('div',{staticClass:"content"},_vm._l((_vm.workerList),function(worker,index){return _c('div',{staticClass:"content"},[_c('BitSharesWorker',{attrs:{"worker":worker}})],1)}))]):_vm._e()])}
 var BitSharesWidgetVoting_staticRenderFns = [function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('tr',[_c('td',{attrs:{"align":"right"}},[_c('a',{attrs:{"href":"https://github.com/blockchainprojects/bitshares-widget-voting"}},[_vm._v("GPL-3.0")]),_vm._v(" © "),_c('a',{attrs:{"href":"http://www.blockchainprojectsbv.com/","target":"_blank"}},[_vm._v("Blockchain BV")])]),_c('td',{attrs:{"align":"left"}},[_c('a',{attrs:{"href":"http://www.blockchainprojectsbv.com/","target":"_blank"}},[_c('img',{attrs:{"src":__webpack_require__("7Otq")}})])])])}]
 var BitSharesWidgetVoting_esExports = { render: BitSharesWidgetVoting_render, staticRenderFns: BitSharesWidgetVoting_staticRenderFns }
 /* harmony default export */ var components_BitSharesWidgetVoting = (BitSharesWidgetVoting_esExports);
 // CONCATENATED MODULE: ./src/components/BitSharesWidgetVoting.vue
 function BitSharesWidgetVoting_injectStyle (ssrContext) {
-  __webpack_require__("Y9Cb")
+  __webpack_require__("lFur")
 }
 var BitSharesWidgetVoting_normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -1024,7 +1178,7 @@ var BitSharesWidgetVoting___vue_template_functional__ = false
 /* styles */
 var BitSharesWidgetVoting___vue_styles__ = BitSharesWidgetVoting_injectStyle
 /* scopeId */
-var BitSharesWidgetVoting___vue_scopeId__ = "data-v-5933be77"
+var BitSharesWidgetVoting___vue_scopeId__ = "data-v-3c2bf420"
 /* moduleIdentifier (server only) */
 var BitSharesWidgetVoting___vue_module_identifier__ = null
 var BitSharesWidgetVoting_Component = BitSharesWidgetVoting_normalizeComponent(
@@ -1038,6 +1192,188 @@ var BitSharesWidgetVoting_Component = BitSharesWidgetVoting_normalizeComponent(
 
 /* harmony default export */ var src_components_BitSharesWidgetVoting = (BitSharesWidgetVoting_Component.exports);
 
+// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/BitSharesWidgetInlineVoting.vue
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+
+/* harmony default export */ var BitSharesWidgetInlineVoting = ({
+    name: 'BitSharesWidgetInlineVoting',
+    props: ['workerid', 'witnessid'],
+    extends: src_components_AbstractBitSharesWidget,
+    components: {},
+    data: function data() {
+        return {
+            workerIdList: [],
+            witnessIdList: [],
+
+            text: "Loading ...",
+
+            tooltipText: "Loading ...",
+
+            votingMessage: null,
+            voted: false,
+
+            store: es["a" /* ChainStore */],
+            FetchChainObjects: es["c" /* FetchChainObjects */]
+        };
+    },
+
+    methods: {
+        connected: function connected() {
+            this.resolveIds();
+            // initialize
+            setTimeout(this.initialize, 500);
+        },
+        /**
+         * Resolve all configured voters
+         */
+        resolveIds: function resolveIds() {
+            if (typeof this.witnessid === 'string' && this.witnessid !== "") {
+                this.witnessIdList = this.witnessid.split(";");
+            }
+            if (typeof this.workerid === 'string' && this.workerid !== "") {
+                this.workerIdList = this.workerid.split(";");
+            }
+            console.log("witness", this.witnessIdList, this.witnessid, "worker", this.workerIdList, this.workerid);
+            if (this.witnessIdList.length > 0 && this.workerIdList.length > 0) {
+                this.text = "Please do only provide either one witness or worker";
+            }
+            if (this.witnessIdList.length > 1) {
+                this.text = "Please do only provide one witness";
+            }
+            if (this.workerIdList.length > 1) {
+                this.text = "Please do only provide one worker";
+            }
+        },
+        /**
+         * Loads the next message and displays it, also updates the tooltip
+         */
+        initialize: function initialize() {
+            var _this = this;
+
+            if (this.witnessIdList.length) {
+                this.chain.db_exec('get_objects', [this.witnessIdList]).then(function (witness) {
+                    _this.chain.db_exec('get_objects', [[witness[0].witness_account]]).then(function (accounts) {
+                        _this.text = accounts[0].name;
+                        _this.voteId = witness[0].vote_id;
+                        _this.tooltipText = "BitShares Witness: " + accounts[0].name;
+                    });
+                });
+            }
+            if (this.workerIdList.length == 1) {
+                this.chain.db_exec('get_objects', [this.workerIdList]).then(function (workers, index) {
+                    _this.text = workers[0];
+                });
+            }
+        },
+        vote: function vote(event) {
+            var thiz = this;
+            this.holder.btscompanion.connect('BitShares Voting Widget').then(function (connected) {
+                if (connected) {
+                    Object(es["b" /* FetchChain */])("getAccount", window.btscompanion.identity.id, undefined, defineProperty_default()({}, window.btscompanion.identity.id, true)).then(function (account) {
+                        account = account.toJS();
+
+                        if (account.options.votes.indexOf(thiz.voteId) == -1) {
+                            window.btscompanion.voteFor({
+                                id: thiz.voteId
+                            }).then(function (result) {
+                                thiz.votingMessage = "Voted";
+                                thiz.voted = true;
+                                console.log(result);
+                            }).catch(function (err) {
+                                thiz.votingMessage = "Voting failed";
+                                thiz.voted = false;
+                                console.log(err);
+                            });
+                        } else {
+                            // already voted on
+                            thiz.votingMessage = "Already voted";
+                            thiz.voted = true;
+                        }
+                    }).catch(function (err) {
+                        console.log(err);
+                    });
+                }
+            });
+        }
+    }
+});
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-48b82d11","hasScoped":true,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetInlineVoting.vue
+var BitSharesWidgetInlineVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('span',{staticClass:"widget-voting",on:{"click":_vm.vote}},[_c('v-popover',[_c('span',{staticClass:"tooltip-target b3"},[_vm._v(_vm._s(_vm.text))]),_vm._v(" "),_c('template',{slot:"popover"},[_c('table',[_c('tbody',[_c('tr',[_c('td',{attrs:{"colspan":"2"}},[_vm._v(_vm._s(_vm.tooltipText))])]),_vm._v(" "),_c('tr',[_c('td',{attrs:{"colspan":"2"}},[_c('div',{staticClass:"voting"},[(_vm.voted)?_c('div',[_c('div',{staticClass:"done"},[_vm._v(_vm._s(_vm.votingMessage)+" ✔")])]):_c('div',[_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")])])])])]),_vm._v(" "),_c('tr',{staticClass:"copyright"},[_c('td',{attrs:{"align":"right"}},[_c('a',{attrs:{"href":"https://github.com/blockchainprojects/bitshares-widget-voting"}},[_vm._v("GitHub")]),_vm._v(" ©\n                            "),_c('a',{attrs:{"href":"http://www.blockchainprojectsbv.com/","target":"_blank"}},[_vm._v("Blockchain Projects BV")])]),_vm._v(" "),_c('td',{attrs:{"align":"left"}},[_c('a',{attrs:{"href":"http://www.blockchainprojectsbv.com/","target":"_blank"}},[_c('img',{attrs:{"src":__webpack_require__("7Otq")}})])])])])])])],2)],1)}
+var BitSharesWidgetInlineVoting_staticRenderFns = []
+var BitSharesWidgetInlineVoting_esExports = { render: BitSharesWidgetInlineVoting_render, staticRenderFns: BitSharesWidgetInlineVoting_staticRenderFns }
+/* harmony default export */ var components_BitSharesWidgetInlineVoting = (BitSharesWidgetInlineVoting_esExports);
+// CONCATENATED MODULE: ./src/components/BitSharesWidgetInlineVoting.vue
+function BitSharesWidgetInlineVoting_injectStyle (ssrContext) {
+  __webpack_require__("OTYh")
+}
+var BitSharesWidgetInlineVoting_normalizeComponent = __webpack_require__("VU/8")
+/* script */
+
+/* template */
+
+/* template functional */
+var BitSharesWidgetInlineVoting___vue_template_functional__ = false
+/* styles */
+var BitSharesWidgetInlineVoting___vue_styles__ = BitSharesWidgetInlineVoting_injectStyle
+/* scopeId */
+var BitSharesWidgetInlineVoting___vue_scopeId__ = "data-v-48b82d11"
+/* moduleIdentifier (server only) */
+var BitSharesWidgetInlineVoting___vue_module_identifier__ = null
+var BitSharesWidgetInlineVoting_Component = BitSharesWidgetInlineVoting_normalizeComponent(
+  BitSharesWidgetInlineVoting,
+  components_BitSharesWidgetInlineVoting,
+  BitSharesWidgetInlineVoting___vue_template_functional__,
+  BitSharesWidgetInlineVoting___vue_styles__,
+  BitSharesWidgetInlineVoting___vue_scopeId__,
+  BitSharesWidgetInlineVoting___vue_module_identifier__
+)
+
+/* harmony default export */ var src_components_BitSharesWidgetInlineVoting = (BitSharesWidgetInlineVoting_Component.exports);
+
 // CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/App.vue
 //
 //
@@ -1045,24 +1381,31 @@ var BitSharesWidgetVoting_Component = BitSharesWidgetVoting_normalizeComponent(
 //
 //
 //
+//
+//
+//
+//
+//
+
 
 
 
 /* harmony default export */ var App = ({
-  name: 'bitshares-widget-voting',
-  props: ['workeridfromdiv'],
-  components: {
-    BitSharesWidgetVoting: src_components_BitSharesWidgetVoting
-  }
+    name: 'bitshares-widget-voting',
+    props: ['workeridfromdiv', 'witnessidfromdiv', 'layoutfromdiv'],
+    components: {
+        BitSharesWidgetVoting: src_components_BitSharesWidgetVoting,
+        BitSharesWidgetInlineVoting: src_components_BitSharesWidgetInlineVoting
+    }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-6491e9fe","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/App.vue
-var App_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{attrs:{"id":"app"}},[_c('BitSharesWidgetVoting',{attrs:{"workerid":_vm.workeridfromdiv}})],1)}
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-d074da02","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/App.vue
+var App_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('span',{attrs:{"id":"app"}},[(_vm.layoutfromdiv == 'inline')?_c('span',[_c('BitSharesWidgetInlineVoting',{attrs:{"workerid":_vm.workeridfromdiv,"witnessid":_vm.witnessidfromdiv}})],1):_c('div',[_c('BitSharesWidgetVoting',{attrs:{"workerid":_vm.workeridfromdiv,"witnessid":_vm.witnessidfromdiv,"layout":_vm.layoutfromdiv}})],1)])}
 var App_staticRenderFns = []
 var App_esExports = { render: App_render, staticRenderFns: App_staticRenderFns }
 /* harmony default export */ var selectortype_template_index_0_src_App = (App_esExports);
 // CONCATENATED MODULE: ./src/App.vue
 function App_injectStyle (ssrContext) {
-  __webpack_require__("lKH/")
+  __webpack_require__("4nVA")
 }
 var App_normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -1094,7 +1437,9 @@ var App_Component = App_normalizeComponent(
 
 
 
+
 vue_esm["a" /* default */].config.productionTip = false;
+vue_esm["a" /* default */].use(v_tooltip_esm["a" /* default */]);
 
 /**
  * This renders the Vue app in the HTML element bitshares-widget-voting.
@@ -1105,26 +1450,59 @@ vue_esm["a" /* default */].config.productionTip = false;
  *
  */
 /* eslint-disable no-new */
-new vue_esm["a" /* default */]({
-  el: '#bitshares-widget-voting',
-  template: '<App :workeridfromdiv="workeridfromdiv" />',
-  components: { App: src_App },
-  beforeMount: function beforeMount() {
-    this.workeridfromdiv = this.$el.attributes['workerid'].value;
-  }
+var i = 0;
 
-});
+var main__loop = function _loop() {
+    var idName = null;
+    if (i == 10) {
+        idName = "bitshares-widget-voting";
+    } else {
+        idName = "bitshares-widget-voting-" + i;
+    }
+    var element = document.getElementById(idName);
+    console.log(idName, element);
+    if (!!element) {
+        new vue_esm["a" /* default */]({
+            el: element,
+            template: '<App :workeridfromdiv="workeridfromdiv" :witnessidfromdiv="witnessidfromdiv" :layoutfromdiv="layoutfromdiv" />',
+            components: { App: src_App },
+            beforeMount: function beforeMount() {
+                try {
+                    this.workeridfromdiv = this.$el.attributes["workerid"].value;
+                } catch (err) {
+                    this.workeridfromdiv = "";
+                }
+                try {
+                    this.witnessidfromdiv = this.$el.attributes["witnessid"].value;
+                } catch (err) {
+                    this.witnessidfromdiv = "";
+                }
+                try {
+                    this.layoutfromdiv = this.$el.attributes["layout"].value;
+                } catch (err) {
+                    this.layoutfromdiv = false;
+                }
+                this.idName = idName;
+            }
+
+        });
+    }
+};
+
+for (i = 0; i < 11; i++) {
+    main__loop();
+}
 
 /***/ }),
 
-/***/ "Y9Cb":
+/***/ "OTYh":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
 
-/***/ "lKH/":
+/***/ "lFur":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin

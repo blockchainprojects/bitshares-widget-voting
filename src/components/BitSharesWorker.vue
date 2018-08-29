@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import holder from '../lib/bitshares-companion-js/main'
+import holder from '../lib/beet-js/main'
 import {ChainStore, FetchChainObjects, TransactionBuilder, FetchChain} from 'bitsharesjs/es'
 
 export default {
@@ -237,5 +237,7 @@ export default {
   {
     border-radius: 15px;
     box-shadow: 0px 2px 5px rgba(25, 25, 25, 0.27);
+    margin-top: 0em;
   }
+
 </style>
