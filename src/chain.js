@@ -1,7 +1,7 @@
 import {Apis, GrapheneApi} from 'bitsharesjs-ws'
 import {ChainStore, FetchChainObjects} from 'bitsharesjs/es'
 
-export class Blockchain {
+class Blockchain {
 
     constructor() {
         this._nodes = [
@@ -11,15 +11,47 @@ export class Blockchain {
             "wss://japan.bitshares.apasia.tech/ws"
         ];
         this._apiInstance = null;
+        this._connected = false;
+        this._connectingInProgress = false;
+
+        this._resolves = [];
+        this._rejects = [];
     }
 
     connect() {
-        return new Promise((resolve, reject) => {
-            this._connect(null, resolve, reject);
+        if (this._connected) {
+            return new Promise((resolve, reject) => {
+                resolve();
+            });
+        } else {
+            if (this._connectingInProgress) {
+                return new Promise((resolve, reject) => {
+                    this._resolves.push(resolve);
+                    this._rejects.push(reject);
+                });
+            } else {
+                return new Promise((resolve, reject) => {
+                    this._connect(null, resolve, reject);
+                });
+            }
+        }
+    }
+
+    _onConnect() {
+        this._resolves.forEach((resolve) => {
+            resolve();
+        });
+    }
+
+    _onError(err) {
+        this._rejects.forEach((reject) => {
+            reject();
         });
     }
 
     _connect(idx = null, resolve, reject) {
+        this._connected = false;
+        this._connectingInProgress = true;
         if (idx == null) {
             idx = 0;
         }
@@ -29,16 +61,21 @@ export class Blockchain {
             ChainStore.init().then(() => {
                 // fetch now for quicker cashing
                 ChainStore.fetchObject('2.1.0');
+                this._connectingInProgress = false;
+                this._connected = true;
                 resolve();
-            })
+                this._onConnect();
+            });
         }).catch((err) => {
             idx = idx + 1;
             if (idx > this._nodes.length - 1) {
+                this._connectingInProgress = false;
                 reject(err);
+                this._onError();
             }
             this._apiInstance.close().then(() => {
                 this._apiInstance = null;
-                this._connect(idx);
+                this._connect(idx, resolve, reject);
             });
         });
     }
@@ -47,3 +84,6 @@ export class Blockchain {
         return this._apiInstance._db.exec(callName, argumentsList);
     }
 }
+
+const chain = new Blockchain();
+export default chain;

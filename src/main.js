@@ -1,11 +1,9 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import VTooltip from 'v-tooltip'
 import App from './App'
 
 Vue.config.productionTip = false;
-Vue.use(VTooltip);
 
 /**
  * This renders the Vue app in the HTML element bitshares-widget-voting.
@@ -25,7 +23,6 @@ for (i = 0; i < 11; i++) {
         idName = "bitshares-widget-voting-" + i;
     }
     let element = document.getElementById(idName);
-    console.log(idName, element)
     if (!!element) {
         new Vue({
             el: element,

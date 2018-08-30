@@ -4,7 +4,7 @@
 </template>
 
 <script>
-    import {Blockchain} from '../chain'
+    import chain from '../chain'
     import {ChainStore, FetchChainObjects} from 'bitsharesjs/es'
     import BitSharesWorker from './BitSharesWorker'
     import holder from '../lib/beet-js/main'
@@ -15,7 +15,7 @@
         data() {
             return {
                 holder: holder,
-                chain: new Blockchain(),
+                chain: chain,
             }
         },
         created: function () {
@@ -32,7 +32,7 @@
                     // resolve the markets props (call will start fetching, unsure how the fetching can be resolved exactly)
                     this.connected();
                 }).catch((err) => {
-                    console.log("Connection attempt failed");
+                    console.log("Connection attempt failed", err);
                 });
             }
         }

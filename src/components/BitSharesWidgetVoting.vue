@@ -20,7 +20,7 @@
 </template>
 
 <script>
-    import {Blockchain} from '../chain'
+    import chain from '../chain'
     import {ChainStore, FetchChainObjects} from 'bitsharesjs/es'
     import BitSharesWorker from './BitSharesWorker'
     import AbstractBitSharesWidget from './AbstractBitSharesWidget'
@@ -50,7 +50,7 @@
                 tooltipMessage: "",
 
                 // BitShares specific connection
-                chain: new Blockchain(),
+                chain: chain,
 
                 store: ChainStore,
                 FetchChainObjects: FetchChainObjects,
@@ -125,17 +125,6 @@
                     this.loadingMessage = null;
                     this.workerList = workerList;
                 });
-
-//      let worker = this.store.getObject(this.workerIdList[0]);
-//      console.log(worker);
-//
-//      Promise.all([
-//        this.FetchChainObjects(this.store.getObjectByVoteID, this.workerIdList, this.workerIdList.length)
-//      ]).then(res => {
-//        console.log(res)
-//      }).catch((err) => {
-//        this.errorMessage = err;
-//      });
             },
         }
     }
