@@ -26,7 +26,7 @@ for (i = 0; i < 11; i++) {
     if (!!element) {
         new Vue({
             el: element,
-            template: '<App :workeridfromdiv="workeridfromdiv" :witnessidfromdiv="witnessidfromdiv" :layoutfromdiv="layoutfromdiv" />',
+            template: '<App :workeridfromdiv="workeridfromdiv" :witnessidfromdiv="witnessidfromdiv" :committeefromdiv="committeefromdiv" :layoutfromdiv="layoutfromdiv" :innerHTML="innerHTML" />',
             components: {App},
             beforeMount: function () {
                 try {
@@ -40,11 +40,17 @@ for (i = 0; i < 11; i++) {
                     this.witnessidfromdiv = ""
                 }
                 try {
+                    this.committeefromdiv = this.$el.attributes["committeeid"].value;
+                } catch (err) {
+                    this.committeefromdiv = ""
+                }
+                try {
                     this.layoutfromdiv = this.$el.attributes["layout"].value;
                 } catch (err) {
                     this.layoutfromdiv = false;
                 }
                 this.idName = idName;
+                this.innerHTML = this.$el.innerHTML;
             },
 
         });

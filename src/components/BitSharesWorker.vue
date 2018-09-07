@@ -24,7 +24,11 @@
           <div class="done">{{votingMessage}} &#10004;</div>
       </div>
       <div v-else>
-          <button class="button" v-on:click="vote">Vote now</button>
+          <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
+          <template v-else>
+              <div class="label">Beet was not found</div>
+              <button @click="goToBeet()" class="button">Install now</button>
+          </template>
       </div>
     </div>
   </div>
@@ -49,6 +53,8 @@ export default {
             votingMessage: null,
             voted: false,
 
+            beetFound: false,
+
             // libs
             holder: holder,
             ChainStore: ChainStore,
@@ -61,46 +67,55 @@ export default {
         this.initialize()
     },
     methods: {
+        goToBeet() {
+            window.open('https://github.com/bitshares/beet','_blank');
+        },
         /**
         * connection to bitshares via bitsharesjs
         */
         initialize: function () {
-        let worker = this.worker;
+            let worker = this.worker;
 
-        let one_day = 1000*60*60*24;
-        this.starts_in = Math.round((new Date(this.worker.work_begin_date + "Z") - new Date()) / one_day);
-
-        this.ends_in = Math.round((new Date(this.worker.work_end_date + "Z") - new Date()) / one_day);
-
-        let loadingDone = this.loadingDone.bind(this);
-
-        let thiz = this;
-        if (worker.worker_account == "1.2.364315") {
-          fetch("https://api.workers.bitshares.foundation/v1/escrow/" + worker.id, {
-            method: "GET",
-            headers: new Headers({
-              Accept: "application/json",
-              "content-type": "application/x-www-form-urlencoded"
-            })
-          }).then(response => {
-            response.json().then((json) => {
-              thiz.current_in_USD = json.amounts.currency.total_max;
-              thiz.asked_in_USD = json.amounts.currency.asked;
-              thiz.receives = json.worker.receives;
-              loadingDone();
+            this.holder.btscompanion.isInstalled().then(status => {
+                this.beetFound = status;
             }).catch((err) => {
-              // could not load escrow details
-              console.log(err);
-              loadingDone();
-            })
-          }).catch((err) => {
-            // could not load escrow details
-            console.log(err);
-            loadingDone();
-          })
-        } else {
-          loadingDone();
-        }
+                this.beetFound = false;
+            });
+
+            let one_day = 1000 * 60 * 60 * 24;
+            this.starts_in = Math.round((new Date(this.worker.work_begin_date + "Z") - new Date()) / one_day);
+
+            this.ends_in = Math.round((new Date(this.worker.work_end_date + "Z") - new Date()) / one_day);
+
+            let loadingDone = this.loadingDone.bind(this);
+
+            let thiz = this;
+            if (worker.worker_account == "1.2.364315") {
+                fetch("https://api.workers.bitshares.foundation/v1/escrow/" + worker.id, {
+                    method: "GET",
+                    headers: new Headers({
+                        Accept: "application/json",
+                        "content-type": "application/x-www-form-urlencoded"
+                    })
+                }).then(response => {
+                    response.json().then((json) => {
+                        thiz.current_in_USD = json.amounts.currency.total_max;
+                        thiz.asked_in_USD = json.amounts.currency.asked;
+                        thiz.receives = json.worker.receives;
+                        loadingDone();
+                    }).catch((err) => {
+                        // could not load escrow details
+                        console.log(err);
+                        loadingDone();
+                    })
+                }).catch((err) => {
+                    // could not load escrow details
+                    console.log(err);
+                    loadingDone();
+                })
+            } else {
+                loadingDone();
+            }
 
         },
         loadingDone: function() {
@@ -182,7 +197,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style>
   .worker
   {
     display:inline-block;
@@ -191,7 +206,6 @@ export default {
     padding: 7px 5px 2px 0px;
     margin-right: 5px;
     margin-left: 5px;
-    height: 110px
   }
 
   .worker h3
@@ -224,6 +238,7 @@ export default {
   .worker .voting
   {
       font-size:0.7em;
+      margin-top: 0.5em;
       margin-bottom: 0.5em;
       float: right;
   }
@@ -238,6 +253,12 @@ export default {
     border-radius: 15px;
     box-shadow: 0px 2px 5px rgba(25, 25, 25, 0.27);
     margin-top: 0em;
+  }
+
+  .worker .voting .label {
+      font-size: 0.7em;
+      color: gray;
+      vertical-align: middle;
   }
 
 </style>

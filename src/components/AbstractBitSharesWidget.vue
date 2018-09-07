@@ -1,6 +1,4 @@
 <template>
-    <div class="widget-voting">
-    </div>
 </template>
 
 <script>
@@ -14,27 +12,74 @@
         props: [],
         data() {
             return {
+                // state of this widget (connecting etc.)
+                stateName: "Initializing",
+
+                // if any error occured
+                errorName: null,
+
+                // installation status
+                beetFound: null,
+                chainConnected: null,
+
+                // chain connectivity
+
+                // access to beet
                 holder: holder,
+
+                // access to blockchain
                 chain: chain,
             }
         },
         created: function () {
-            this.connectToChainAndStart()
+            console.log("creatd")
+            setTimeout(()=>{
+                console.log("timed")
+                this.stateName = "ConnectingToChain";
+                this._connectToChainAndStart();
+            }, 1);
         },
         methods: {
+            errored: function(error, message = "") {
+                this.stateName = "Errored";
+                this.errorName = error;
+            },
+            _checkBeetInstallation: function() {
+                this.holder.btscompanion.isInstalled().then(status => {
+                    console.log(status);
+                    this.beetFound = status;
+                    this.onBeetFound(status);
+                    this.stateName = "Done";
+                }).catch((err) => {
+                    this.errored(err);
+                    this.beetFound = false;
+                    this.onBeetFound(false);
+                });
+            },
             /**
              * connection to bitshares via bitsharesjs
              */
-            connectToChainAndStart: function () {
+            _connectToChainAndStart: function () {
                 // connection and then the ChainStore is initialized
                 this.chain.connect().then(() => {
-                    console.log("Connected and synced");
-                    // resolve the markets props (call will start fetching, unsure how the fetching can be resolved exactly)
-                    this.connected();
+                    this.chainConnected = true;
+                    this.onConnected();
+
+                    this.stateName = "CheckingBeetInstallation";
+                    this._checkBeetInstallation();
                 }).catch((err) => {
+                    this.errored(err);
                     console.log("Connection attempt failed", err);
+                    this.chainConnected = false;
                 });
+            },
+            onBeetFound: function(status) {
+                // may be overwritten
+            },
+            onConnected: function(status) {
+                // may be overwritten
             }
+
         }
     }
 </script>

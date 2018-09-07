@@ -1,49 +1,18 @@
 <template>
     <span class="widget-inline-voting">
-        <!--<span class="voting-text" v-popover="{ name: 'voting-popup-' + this.popoverIdentifier }">{{ text }}</span>
-        <popover :name="'voting-popup-' + this.popoverIdentifier">
-            <table class="voting-popup-content">
-                <tbody>
-                    <tr>
-                        <td colspan="2">{{ tooltipText }}</td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <div class="voting">
-                                <div v-if="voted">
-                                <div class="done">{{votingMessage}} &#10004;</div>
-                            </div>
-                            <div v-else>
-                                <button class="button" v-on:click="vote">Vote now</button>
-                            </div>
-                        </div>
-                    </td>
-                    </tr>
-                    <tr class="copyright">
-                        <td align="right">
-                            <a href="https://github.com/blockchainprojects/bitshares-widget-voting">GitHub</a> &copy;
-                            <a href="http://www.blockchainprojectsbv.com/" target="_blank">Blockchain Projects BV</a>
-                        </td>
-                        <td align="left">
-                            <a href="http://www.blockchainprojectsbv.com/" target="_blank">
-                                <img src="../assets/logo.png">
-                            </a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </popover>-->
         <div class="voting-text" v-on:click="show">{{ text }}</div>
         <div class="voting-popup" v-show="showPopup">
             <div class="voting-popup-content">
-                <div>{{ tooltipText }}</div><br />
-                <div class="voting">
-                    <div v-if="voted">
-                        <div class="done">{{votingMessage}} &#10004;</div>
-                    </div>
-                    <div v-else>
-                        <button class="button" v-on:click="vote">Vote now</button>
-                    </div>
+                <div>{{ popUpText }}</div><br />
+                <div class="voting" v-if="votingObject != null">
+                    <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
+                    <template v-else>
+                        <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
+                        <template v-else>
+                            <div class="label">Beet was not found</div>
+                            <button @click="goToBeet()" class="button">Install now</button>
+                        </template>
+                    </template>
                 </div><br /><br /><br />
                 <div class="copyright">
                     <a href="https://github.com/blockchainprojects/bitshares-widget-voting">GitHub</a> &copy;
@@ -59,139 +28,74 @@
 
 <script>
     import {ChainStore, FetchChainObjects, FetchChain} from 'bitsharesjs/es'
-    import AbstractBitSharesWidget from './AbstractBitSharesWidget'
+    import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
 
     export default {
         name: 'BitSharesWidgetInlineVoting',
-        props: ['workerid', 'witnessid'],
-        extends: AbstractBitSharesWidget,
-        components: {
-        },
+        extends: AbstractBitSharesWidgetVoting,
         data() {
             return {
                 showPopup: false,
 
-                workerIdList: [],
-                witnessIdList: [],
+                text: this.innerHTML, // initialize with given text
+                popUpText: "Loading ...",
 
-                text: "Loading ...",
-
-                tooltipText: "Loading ...",
-
-                voteId: null,
-                beetVoteId: null,
-
-                votingMessage: null,
-                voted: false,
-
-                popoverIdentifier: null,
+                votingObject: null,
 
                 store: ChainStore,
                 FetchChainObjects: FetchChainObjects,
             }
         },
-        beforeMount: function() {
-            this.popoverIdentifier = this.resolveIds();
-        },
         methods: {
-            connected: function() {
-                // initialize
-                setTimeout(this.initialize, 100);
+            goToBeet() {
+                window.open('https://github.com/bitshares/beet','_blank');
+            },
+            showVotingObject() {
+                this.text = this.votingObject.text;
+                this.popUpText = this.votingObject.type + " " + this.votingObject.text;
+            },
+            onResolvedVotingInput: function() {
+                let uniqueIdList = null;
+                if (!!this.witnessIds && Object.keys(this.witnessIds).length == 1) {
+                    uniqueIdList = this.witnessIds;
+                }
+                if (!!this.workerIds && Object.keys(this.workerIds).length == 1) {
+                    if (uniqueIdList != null) {
+                        this.text = "Please do only provide one object type for voting"
+                    } else {
+                        uniqueIdList = this.workerIds;
+                    }
+                }
+                if (!!this.committeeIds && Object.keys(this.committeeIds).length == 1) {
+                    if (uniqueIdList != null) {
+                        this.text = "Please do only provide one object type for voting"
+                    } else {
+                        uniqueIdList = this.committeeIds;
+                    }
+                }
+                if (uniqueIdList == null) {
+                    this.text = "Please provide exactly one object type for voting";
+                    this.errored("Initializing failed");
+                }
+                this.votingObject = uniqueIdList[Object.keys(uniqueIdList)[0]];
+            },
+            onResolvedVotingId: function() {
+                this.showVotingObject();
             },
             show: function() {
-                console.log("show", this.showPopup);
                 this.showPopup = !this.showPopup;
-            },
-            /**
-             * Resolve all configured voters
-             */
-            resolveIds: function () {
-                if (typeof this.witnessid === 'string' && this.witnessid !== "" ) {
-                    this.witnessIdList = this.witnessid.split(";")
-                }
-                if (typeof this.workerid === 'string' && this.workerid !== "") {
-                    this.workerIdList = this.workerid.split(";")
-                }
-                if (this.witnessIdList.length > 0 && this.workerIdList.length > 0) {
-                    this.text = "Please do only provide either one witness or worker"
-                }
-                if (this.witnessIdList.length > 1) {
-                    this.text = "Please do only provide one witness"
-                }
-                if (this.workerIdList.length > 1) {
-                    this.text = "Please do only provide one worker"
-                }
-                if (this.witnessIdList.length == 1) {
-                    return this.witnessIdList[0];
-                }
-                if (this.workerIdList.length == 1) {
-                    return this.workerIdList[0];
-                }
-            },
-            /**
-             * Loads the next message and displays it, also updates the tooltip
-             */
-            initialize: function () {
-                if (this.witnessIdList.length == 1) {
-                    this.chain.db_exec('get_objects', [this.witnessIdList]).then((witness) => {
-                        this.chain.db_exec('get_objects', [[witness[0].witness_account]]).then((accounts) => {
-                            this.text = accounts[0].name;
-                            this.voteId = witness[0].vote_id;
-                            this.beetVoteId = witness[0].id;
-                            this.tooltipText = "BitShares Witness: " + accounts[0].name;
-                            console.log("witness found, vote id is ", this.voteId);
-                        });
-                    });
-                }
-                if (this.workerIdList.length == 1) {
-                    this.chain.db_exec('get_objects', [this.workerIdList]).then((workers, index) => {
-                        this.text = workers[0].name;
-                        this.voteId = workers[0].vote_for;
-                        this.beetVoteId = workers[0].id;
-                        this.tooltipText = "BitShares Worker: " + workers[0].name;
-                        console.log("worker found, vote id is ", this.voteId);
-                    });
-                }
-            },
-            vote: function (event) {
-                let thiz = this;
-                this.holder.btscompanion.connect('BitShares Voting Widget').then(connected => {
-                    if (connected) {
-                        FetchChain("getAccount", window.btscompanion.identity.id, undefined, {
-                            [window.btscompanion.identity.id]: true
-                        }).then((account) => {
-                            account = account.toJS();
-                            console.log("Ensuring vote for ", thiz.voteId);
-                            if (account.options.votes.indexOf(thiz.voteId) == -1) {
-                                window.btscompanion.voteFor(
-                                    {
-                                        id: thiz.beetVoteId
-                                    }
-                                ).then((result) => {
-                                    thiz.votingMessage = "Voted";
-                                    thiz.voted = true;
-                                    console.log(result);
-                                }).catch((err) => {
-                                    thiz.votingMessage = "Voting failed";
-                                    thiz.voted = false;
-                                    console.log(err);
-                                });
-                            } else {
-                                // already voted on
-                                thiz.votingMessage = "Already voted";
-                                thiz.voted = true;
-                            }
-                        }).catch((err) => {
-                            console.log(err);
-                        })
-                    }
-                })
             }
         }
     }
 </script>
 
 <style>
+    .widget-inline-voting
+    {
+        color: #2c3e50;
+        font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    }
+
     .widget-inline-voting .voting-popup-content
     {
         font-size:0.9em;
@@ -241,12 +145,22 @@
         font-size:0.9em;
     }
 
+    .widget-inline-voting .voting-popup-content .voting {
+        float: right;
+    }
+
+    .widget-inline-voting .voting-popup-content .voting .label {
+        font-size: 0.7em;
+        color: gray;
+        vertical-align: middle;
+    }
+
+
     .widget-inline-voting .voting-popup-content .button
     {
         border-radius: 15px;
         margin-top: 0.3em;
         margin-bottom: 0.3em;
-        float: right;
     }
 
 

@@ -57,7 +57,7 @@
             }
         },
         methods: {
-            connected: function() {
+            onConnected: function() {
                 console.log(this.layout);
                 this.resolveWorker();
 
@@ -118,6 +118,15 @@
 
                 let workerList = [];
 
+                this.holder.btscompanion.isInstalled().then(status => {
+                    this.beetFound = status;
+                    this.onBeetFound(status);
+                }).catch((err) => {
+                    this.errored(err);
+                    this.beetFound = false;
+                    this.onBeetFound(false);
+                });
+
                 this.chain.db_exec('get_objects', [this.workerIdList]).then((workers, index) => {
                     workers.forEach((worker) => {
                         workerList.push(worker);
@@ -133,6 +142,8 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     .widget-voting {
+        text-align: center;
+        font-family: 'Avenir', Helvetica, Arial, sans-serif;
     }
 
     .widget-voting h2 {

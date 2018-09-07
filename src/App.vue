@@ -1,12 +1,6 @@
 <template>
-    <span id="app">
-        <span v-if="layoutfromdiv == 'inline'">
-            <BitSharesWidgetInlineVoting :workerid=workeridfromdiv :witnessid=witnessidfromdiv />
-        </span>
-        <div v-else>
-            <BitSharesWidgetVoting :workerid=workeridfromdiv :witnessid=witnessidfromdiv :layout=layoutfromdiv />
-        </div>
-    </span>
+    <BitSharesWidgetInlineVoting v-if="layoutfromdiv == 'inline'" :workerid=workeridfromdiv :witnessid=witnessidfromdiv :committeeid=committeefromdiv :innerHTML=innerHTML />
+    <BitSharesWidgetVoting v-else :workerid=workeridfromdiv :witnessid=witnessidfromdiv :layout=layoutfromdiv />
 </template>
 
 <script>
@@ -15,9 +9,12 @@
 
     export default {
         name: 'bitshares-widget-voting',
-        props: ['workeridfromdiv',
+        props: [
+            'workeridfromdiv',
             'witnessidfromdiv',
-            'layoutfromdiv'
+            'layoutfromdiv',
+            'committeefromdiv',
+            'innerHTML'
         ],
         components: {
             BitSharesWidgetVoting,
@@ -27,21 +24,4 @@
 </script>
 
 <style>
-    #app {
-        font-family: 'Avenir', Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-align: center;
-        color: #2c3e50;
-        margin-top: 60px;
-    }
-
-    .tooltip .tooltip-inner .button
-    {
-        border-radius: 15px;
-        margin-top: 0.3em;
-        margin-bottom: 0.3em;
-        float: right;
-    }
-
 </style>
