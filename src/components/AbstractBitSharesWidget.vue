@@ -29,22 +29,32 @@
 
                 // access to blockchain
                 chain: chain,
+
+                ChainStore: ChainStore,
+                FetchChainObjects: FetchChainObjects,
             }
         },
         created: function () {
-            console.log("creatd")
             setTimeout(()=>{
-                console.log("timed")
                 this.stateName = "ConnectingToChain";
                 this._connectToChainAndStart();
             }, 1);
         },
         methods: {
+            goToBeet() {
+                window.open('https://github.com/bitshares/beet','_blank');
+                this.beetFound = true;
+            },
             errored: function(error, message = "") {
                 this.stateName = "Errored";
                 this.errorName = error;
             },
             _checkBeetInstallation: function() {
+                this.beetFound = true;
+                this.onBeetFound(true);
+                this.stateName = "Done";
+                return;
+                // wait for new release
                 this.holder.btscompanion.isInstalled().then(status => {
                     console.log(status);
                     this.beetFound = status;
@@ -54,7 +64,16 @@
                     this.errored(err);
                     this.beetFound = false;
                     this.onBeetFound(false);
+                    setTimeout(()=>{
+                        console.log("retrying to find beet")
+                        this._checkBeetInstallation();
+                    }, 5000);
                 });
+            },
+            setBeetInstallationStatus: function(status) {
+                this.beetFound = status;
+                this.onBeetFound(status);
+                this.stateName = "WaitingForBeet";
             },
             /**
              * connection to bitshares via bitsharesjs
@@ -86,4 +105,12 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
+    a {
+        color: #1E7EC8;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
 </style>
