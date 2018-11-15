@@ -5,8 +5,8 @@
             <div class="widget-voting--popup--content">
                 <div>{{ popUpText }}</div><br />
                 <div class="voting" v-if="votingObject != null">
-                    <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
                     <div v-if="!!votingObject.failed" class="done">Voting failed</div>
+                    <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
                     <template v-else>
                         <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
                         <template v-else>

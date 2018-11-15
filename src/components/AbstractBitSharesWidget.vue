@@ -3,9 +3,10 @@
 
 <script>
     import chain from '../chain'
+    import beeet from '../beet'
     import {ChainStore, FetchChainObjects} from 'bitsharesjs/es'
     import BitSharesWorker from './BitSharesWorker'
-    import holder from '../lib/beet-js/main'
+
 
     export default {
         name: 'AbstractBitSharesWidget',
@@ -25,7 +26,7 @@
                 // chain connectivity
 
                 // access to beet
-                holder: holder,
+                beet: beeet,
 
                 // access to blockchain
                 chain: chain,
@@ -46,17 +47,14 @@
                 this.beetFound = true;
             },
             errored: function(error, message = "") {
+                console.log(error);
                 this.stateName = "Errored";
                 this.errorName = error;
             },
             _checkBeetInstallation: function() {
-                this.beetFound = true;
-                this.onBeetFound(true);
-                this.stateName = "Done";
-                return;
-                // wait for new release
-                this.holder.btscompanion.isInstalled().then(status => {
-                    console.log(status);
+                this.beetFound = false;
+
+                this.beet.isInstalled().then(status => {
                     this.beetFound = status;
                     this.onBeetFound(status);
                     this.stateName = "Done";

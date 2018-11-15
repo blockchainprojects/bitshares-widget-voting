@@ -36,6 +36,9 @@
             onResolvedVotingProps: function() {
                 // overwrite
             },
+            onVotingObjectsUpdate: function() {
+                // overwrite
+            },
             showPopup: function() {
                 this.isPopupVisible = !this.isPopupVisible;
             },
@@ -145,9 +148,9 @@
                 if (status) {
                     // check voting status
                     let thiz = this;
-                    this.holder.btscompanion.connect('BitShares Voting Widget - Display voting status').then(connected => {
+                    this.beet.connect().then(connected => {
                         if (connected) {
-                            thiz._checkIfVoted(window.btscompanion.identity.id);
+                            thiz._checkIfVoted(connected.account_id);
                         } else {
                             this.errored("Connection to Beet could not be established");
                             this.setBeetInstallationStatus(false);
@@ -156,7 +159,6 @@
                 }
             },
             _checkIfVoted: function(accountId, voteId = null) {
-                console.log("Checking votes");
                 return new Promise((resolve, reject) =>
                 {
                     let thiz = this;
@@ -186,22 +188,23 @@
                     } else {
                         objectIds[key].voted = true;
                     }
+                    this.onVotingObjectsUpdate();
                 }
             },
             vote: function (votingObject) {
                 let thiz = this;
 
-                this.holder.btscompanion.connect('BitShares Voting Widget - Cast vote').then(connected => {
-                    if (connected) {
-                        thiz._checkIfVoted(window.btscompanion.identity.id, votingObject.voteId).then((voted) => {
+                this.beet.connect().then(connected => {
+                    if (!!connected) {
+                        thiz._checkIfVoted(connected.account_id, votingObject.voteId).then((voted) => {
                             if (!voted) {
-                                window.btscompanion.voteFor(
+                                connected.beet.voteFor(
                                     {
-                                        id: thiz.beetVoteId
+                                        id: thiz.votingObject.id
                                     }
                                 ).then((result) => {
                                     votingObject.voted = true;
-                                    console.log(result);
+                                    this.onVotingObjectsUpdate();
                                 }).catch((err) => {
                                     votingObject.failed = true;
                                     thiz.errored(err);

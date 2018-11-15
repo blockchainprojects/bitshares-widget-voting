@@ -24,8 +24,8 @@
       Votes: {{ Math.round(worker.total_votes_for / 100000).toLocaleString() }} BTS
     </div>
     <div class="voting" v-if="votingObject != null">
-      <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
       <div v-if="!!votingObject.failed" class="done">Voting failed</div>
+      <div v-if="votingObject.voted || voted" class="done">Voted &#10004;</div>
       <template v-else>
           <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
           <template v-else>
@@ -54,10 +54,15 @@ export default {
 
             loading: true,
 
+            voted: false,
+
             FetchChain: FetchChain
     }
     },
     methods: {
+        onVotingObjectsUpdate() {
+            this.voted = this.votingObject.voted;
+        },
         onResolvedVotingProps: function() {
             let uniqueIdList = null;
             if (!!this.witnessIds && Object.keys(this.witnessIds).length == 1) {
@@ -125,76 +130,9 @@ export default {
             } else {
                 loadingDone();
             }
-
         },
         loadingDone: function() {
             this.loading = false;
-        },
-        vote: function (event) {
-            let thiz = this;
-            this.holder.btscompanion.connect('BitShares Voting Widget').then(connected => {
-                if (connected) {
-                    //let updateObject = {account: window.btscompanion.identity.id};
-
-                    FetchChain("getAccount", window.btscompanion.identity.id, undefined, {
-                        [window.btscompanion.identity.id]: true
-                    }).then((account) => {
-                        account = account.toJS()
-                        if (account.options.votes.indexOf(thiz.worker.vote_for) == -1) {
-                            window.btscompanion.voteFor(
-                                {
-                                    id: thiz.worker.id
-                                }
-                            ).then((result) => {
-                                thiz.votingObject.voted = true;
-                                console.log(result);
-                            }).catch((err) => {
-                                thiz.votingObject.failed = true;
-                                console.log(err);
-                            });
-//
-//                            let new_options = account.options;
-//                            new_options.votes.push(thiz.worker.vote_for)
-//                            new_options.votes = new_options.votes.sort((a, b) => {
-//                                let a_split = a.split(":");
-//                                let b_split = b.split(":");
-//
-//                                return (
-//                                    parseInt(a_split[1], 10) - parseInt(b_split[1], 10)
-//                                );
-//                            });
-//
-//                            updateObject.new_options = new_options;
-//                            // Set fee asset
-//                            updateObject.fee = {
-//                                amount: 0,
-//                                asset_id: "1.3.0"
-//                            };
-//
-//                            window.btscompanion.requestSignature(
-//                                {
-//                                    op_type: "account_update",
-//                                    op_data: updateObject
-//                                }
-//                            ).then((result) => {
-//                                thiz.votingMessage = "Voted";
-//                                thiz.voted = true;
-//                                console.log(result);
-//                            }).catch((err) => {
-//                                thiz.votingMessage = "Voting failed";
-//                                thiz.voted = false;
-//                                console.log(err);
-//                            })
-                        } else {
-                            // already voted on
-                            thiz.votingMessage = "Already voted";
-                            thiz.voted = true;
-                        }
-                    }).catch((err) => {
-                        console.log(err);
-                    })
-                }
-            })
         }
     }
 }
