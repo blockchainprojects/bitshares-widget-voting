@@ -3,7 +3,14 @@
         <div class="widget-voting--inline--text" v-on:click="showPopup">{{ text }}</div>
         <div class="widget-voting--popup" v-show="isPopupVisible">
             <div class="widget-voting--popup--content">
-                <div>{{ popUpText }}</div><br />
+                <div class="title">
+                    <a v-if="votingObject.object != null" :href="'http://bitshares-explorer.io/#/objects/' + votingObject.object.id" target="_blank">
+                        {{ popUpText }}
+                    </a>
+                    <template v-else>
+                        {{ popUpText }}
+                    </template>
+                </div>
                 <div class="voting" v-if="votingObject != null">
                     <div v-if="!!votingObject.failed" class="done">Voting failed</div>
                     <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
@@ -14,8 +21,10 @@
                             <button @click="goToBeet()" class="button">Install now</button>
                         </template>
                     </template>
-                </div><br /><br /><br />
-                <BCPCopyright></BCPCopyright>
+                </div>
+                <div class="copyright">
+                    <BCPCopyright></BCPCopyright>
+                </div>
             </div>
         </div>
     </span>
@@ -42,7 +51,8 @@
         methods: {
             showVotingObject() {
                 this.text = this.votingObject.text;
-                this.popUpText = this.votingObject.type + " " + this.votingObject.text;
+                this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
+                console.log(this.votingObject)
             },
             onResolvedVotingProps: function() {
                 let uniqueIdList = null;
@@ -100,6 +110,15 @@
 
     .widget-voting--popup--content .voting {
         float: right;
+        margin-top: 0.5em;
+    }
+
+    .widget-voting--popup--content .title {
+    }
+
+    .widget-voting--popup--content .copyright {
+        float: left;
+        margin-top: 2.5em;
     }
 
     .widget-voting--popup--content .voting .label {
@@ -108,12 +127,9 @@
         vertical-align: middle;
     }
 
-
     .widget-voting--popup--content .button
     {
         border-radius: 15px;
-        margin-top: 0.3em;
-        margin-bottom: 0.3em;
     }
 
 

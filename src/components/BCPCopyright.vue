@@ -17,15 +17,6 @@
         font-size:0.8em;
     }
 
-    .widget--copyright a {
-        color: #1E7EC8;
-        text-decoration: none;
-    }
-
-    .widget--copyright a:hover {
-        text-decoration: underline;
-    }
-
     .widget--copyright img {
         height: 1.6em;
         width: 1.6em;
