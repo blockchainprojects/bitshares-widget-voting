@@ -3,157 +3,136 @@
 
 <script>
     import {FetchChain} from 'bitsharesjs/es'
-    import AbstractBitSharesWidget from './AbstractBitSharesWidget'
+    import AbstractWidget from './AbstractWidget'
 
     export default {
-        name: 'AbstractBitSharesWidgetVoting',
-        props: ['workerid', 'witnessid', 'committeeid', 'innerHTML'],
-        extends: AbstractBitSharesWidget,
+        name: 'AbstractWidgetResolving',
+        props: ['objectid'],
+        extends: AbstractWidget,
         components: {
         },
         data() {
             return {
-                workerIds: null,
-                witnessIds: null,
-                committeeIds: null,
-
+                objectIds: null,
                 isPopupVisible: false,
-                resolveIds: true
+
+                resolveIdsFromPropsOnCreate: true,
+                resolveIdsFromChainOnConnected: true
             }
         },
         beforeMount: function() {
-            this._resolveIdsFromProps();
+            if (this.resolveIdsFromPropsOnCreate) {
+                this._resolveIdsFromProps();
+            }
         },
         methods: {
             onConnected: function() {
-                if (this.resolveIds) {
+                if (this.resolveIdsFromChainOnConnected) {
                     this._resolveIdsOnChain();
                 }
             },
-            onResolvedVotingId: function() {
+            onResolvedIdFromChain: function() {
                 // overwrite
             },
-            onResolvedVotingProps: function() {
+            onResolvedIdFromProps: function() {
                 // overwrite
             },
-            onVotingObjectsUpdate: function() {
+            onObjectsUpdate: function() {
                 // overwrite
             },
             showPopup: function() {
                 this.isPopupVisible = !this.isPopupVisible;
             },
             _resolveIdsFromProps: function () {
-                if (typeof this.witnessid === 'string' && this.witnessid !== "" ) {
-                    this.witnessIds = {};
-                    this.witnessid.split(";").forEach((item) => {
-                        this.witnessIds[item] = {
+                if (typeof this.objectid === 'string' && this.witnessid !== "" ) {
+                    this.objectIds = {};
+
+                    this.objectid.split(";").forEach((item) => {
+                        this.objectIds[item] = {
                             "id": item,
-                            "type": "Witness"
+                            "type": item.split(".")[1]
                         }
                     });
-                } else if (typeof this.witnessid === 'object') {
+                } else if (typeof this.objectid === 'object') {
                     // already resolved
 
                     // convert to dict that has the ids as struct
-                    if ("id" in this.witnessid) {
-                        this.witnessIds = {};
-                        this.witnessIds[this.witnessid.id] = this.witnessid;
+                    if ("id" in this.objectid) {
+                        this.objectIds = {};
+                        this.objectIds[this.objectid.id] = this.objectid;
                     } else {
-                        this.witnessIds = this.witnessid;
+                        this.objectIds = this.objectid;
                     }
                 }
-                if (typeof this.workerid === 'string' && this.workerid !== "") {
-                    this.workerIds = {};
-                    this.workerid.split(";").forEach((item) => {
-                        this.workerIds[item] = {
-                            "id": item,
-                            "type": "Worker"
-                        }
-                    });
-                } else if (typeof this.workerid === 'object') {
-                    // already resolved
-
-                    // convert to dict that has the ids as struct
-                    if ("id" in this.workerid) {
-                        this.workerIds = {};
-                        this.workerIds[this.workerid.id] = this.workerid;
-                    } else {
-                        this.workerIds = this.workerid;
-                    }
+                this.onResolvedIdFromProps();
+            },
+            _getOnChainResolvePromise(type, ids) {
+                let thiz = this;
+                if (type == "6") {
+                    // witness
+                    return new Promise((resolve) => {
+                        thiz.chain.db_exec('get_objects', [ids]).then((chainObjects) => {
+                            chainObjects.forEach((chainObject) => {
+                                thiz.chain.db_exec('get_objects', [[chainObject.witness_account]]).then((accounts) => {
+                                    thiz.objectIds[chainObject.id].voteId = chainObject.vote_id;
+                                    thiz.objectIds[chainObject.id].object = chainObject;
+                                    thiz.objectIds[chainObject.id].text = accounts[0].name;
+                                    thiz.objectIds[chainObject.id].voted = null;
+                                    console.log("votable chain object found", thiz.objectIds[chainObject.id]);
+                                    resolve();
+                                });
+                            });
+                        });
+                    })
+                } else if (type == "14") {
+                    return new Promise((resolve) => {
+                        this.chain.db_exec('get_objects', [ids]).then((chainObjects) => {
+                            chainObjects.forEach((chainObject) => {
+                                thiz.objectIds[chainObject.id].voteId = chainObject.vote_for;
+                                thiz.objectIds[chainObject.id].object = chainObject;
+                                thiz.objectIds[chainObject.id].text = chainObject.name;
+                                thiz.objectIds[chainObject.id].voted = null;
+                                console.log("votable chain object found", thiz.objectIds[chainObject.id]);
+                            });
+                            resolve();
+                        });
+                    })
+                } else if (type == "14") {
+                    return new Promise((resolve) => {
+                        this.chain.db_exec('get_objects', [ids]).then((chainObjects) => {
+                            chainObjects.forEach((chainObject) => {
+                                thiz.chain.db_exec('get_objects', [[chainObject.committee_account]]).then((accounts) => {
+                                    thiz.objectIds[chainObject.id].voteId = chainObject.vote_for;
+                                    thiz.objectIds[chainObject.id].object = chainObject;
+                                    thiz.objectIds[chainObject.id].text = accounts[0].name;
+                                    thiz.objectIds[chainObject.id].voted = null;
+                                    console.log("votable chain object found", thiz.objectIds[chainObjects.id]);
+                                    resolve();
+                                });
+                            });
+                        });
+                    })
+                } else {
+                    throw "Unsupported object id";
                 }
-                if (typeof this.committeeid === 'string' && this.committeeid !== "") {
-                    this.committeeIds = {};
-                    this.committeeid.split(";").forEach((item) => {
-                        this.committeeIds[item] = {
-                            "id": item,
-                            "type": "Committee"
-                        }
-                    });
-                } else if (typeof this.committeeid === 'object') {
-                    // already resolved
-
-                    // convert to dict that has the ids as struct
-                    if ("id" in this.committeeid) {
-                        this.committeeIds = {};
-                        this.committeeIds[this.committeeid.id] = this.committeeid;
-                    } else {
-                        this.committeeIds = this.committeeid;
-                    }
-                }
-                this.onResolvedVotingProps();
             },
             _resolveIdsOnChain: function () {
                 let resolve_all = [];
                 let thiz = this;
-                if (!!this.witnessIds && Object.keys(this.witnessIds).length > 0) {
-                    resolve_all.push(new Promise((resolve) => {
-                        thiz.chain.db_exec('get_objects', [Object.keys(thiz.witnessIds)]).then((chainObjects) => {
-                            chainObjects.forEach((chainObject) => {
-                                thiz.chain.db_exec('get_objects', [[chainObject.witness_account]]).then((accounts) => {
-                                    thiz.witnessIds[chainObject.id].voteId = chainObject.vote_id;
-                                    thiz.witnessIds[chainObject.id].object = chainObject;
-                                    thiz.witnessIds[chainObject.id].text = accounts[0].name;
-                                    thiz.witnessIds[chainObject.id].voted = null;
-                                    console.log("votable chain object found", thiz.witnessIds[chainObject.id]);
-                                    resolve();
-                                });
-                            });
-                        });
-                    }));
 
-                }
-                if (!!this.workerIds && Object.keys(this.workerIds).length > 0) {
-                    resolve_all.push(new Promise((resolve) => {
-                        this.chain.db_exec('get_objects', [Object.keys(thiz.workerIds)]).then((chainObjects) => {
-                            chainObjects.forEach((chainObject) => {
-                                thiz.workerIds[chainObject.id].voteId = chainObject.vote_for;
-                                thiz.workerIds[chainObject.id].object = chainObject;
-                                thiz.workerIds[chainObject.id].text = chainObject.name;
-                                thiz.workerIds[chainObject.id].voted = null;
-                                console.log("votable chain object found", thiz.workerIds[chainObject.id]);
-                            });
-                            resolve();
-                        });
-                    }));
-                }
-                if (!!this.committeeIds && Object.keys(this.committeeIds).length > 0) {
-                    resolve_all.push(new Promise((resolve) => {
-                        this.chain.db_exec('get_objects', [Object.keys(thiz.committeeIds)]).then((chainObjects) => {
-                            chainObjects.forEach((chainObject) => {
-                                thiz.chain.db_exec('get_objects', [[chainObject.committee_account]]).then((accounts) => {
-                                    thiz.committeeIds[chainObject.id].voteId = chainObject.vote_for;
-                                    thiz.committeeIds[chainObject.id].object = chainObject;
-                                    thiz.committeeIds[chainObject.id].text = accounts[0].name;
-                                    thiz.committeeIds[chainObject.id].voted = null;
-                                    console.log("votable chain object found", thiz.committeeIds[chainObjects.id]);
-                                    resolve();
-                                });
-                            });
-                        });
-                    }));
-                }
+                // sort same types together
+                let idsPerType = {};
+                this.witnessIds.forEach((key,value) => {
+                    if (!(value.type in idsPerType)) {
+                        idsPerType[value.type] = []
+                    }
+                    idsPerType[value.type].push(key);
+                });
+                idsPerType.forEach((key,value) => {
+                    resolve_all.push(this._getOnChainResolvePromise(key, value));
+                });
                 Promise.all(resolve_all).then(() => {
-                    thiz.onResolvedVotingId();
+                    thiz.onResolvedIdFromChain();
                 });
             },
             onBeetFound: function (status) {

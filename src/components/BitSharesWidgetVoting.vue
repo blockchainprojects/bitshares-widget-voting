@@ -1,6 +1,6 @@
 <template>
     <div class="widget-voting--tiles">
-        <div v-if="workerIds">
+        <div v-if="objectIds">
             <div class="widget-voting--tiles--title" v-on:click="showPopup"><h2>BitShares Widget for Voting</h2></div>
             <div class="widget-voting--popup" v-show="isPopupVisible">
                 <div class="widget-voting--popup--content">
@@ -10,7 +10,7 @@
             <br/>
             <div v-if="loadingMessage" class="widget-voting--tiles--loading-message">{{ loadingMessage }}</div>
             <div v-else>
-                <div class="widget-voting--tiles--tile" v-for="worker in workerIds">
+                <div class="widget-voting--tiles--tile" v-for="worker in objectIds">
                     <BitSharesWorker :workerid="worker"/>
                 </div>
             </div>
@@ -22,13 +22,13 @@
     import {FetchChain} from 'bitsharesjs/es'
 
     import BitSharesWorker from './BitSharesWorker'
-    import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
+    import AbstractWidgetResolving from './AbstractWidgetResolving'
     import BCPCopyright from './BCPCopyright'
 
     export default {
         name: 'BitSharesWidgetVoting',
         props: ['layout'],
-        extends: AbstractBitSharesWidgetVoting,
+        extends: AbstractWidgetResolving,
         components: {
             BitSharesWorker,
             BCPCopyright
@@ -69,7 +69,7 @@
                 let currentDate = new Date();
                 return currentDate.getHours() + ':' + ('0' + currentDate.getMinutes()).slice(-2)
             },
-            onConnected: function() {
+            onResolvedIdFromChain: function() {
                 this.getHeadMessage().then(message => {
                     this.popupMessage = message;
                 });
@@ -77,10 +77,8 @@
             /**
              * Loads the next message and displays it, also updates the tooltip
              */
-            onResolvedVotingProps: function () {
-                if (!!this.workerIds) {
-                    this.loadingMessage = null;
-                }
+            onResolvedIdFromProps: function () {
+                this.loadingMessage = null;
             },
         }
     }

@@ -9,7 +9,7 @@
 
 
     export default {
-        name: 'AbstractBitSharesWidget',
+        name: 'AbstractWidget',
         props: [],
         data() {
             return {
@@ -17,13 +17,11 @@
                 stateName: "Initializing",
 
                 // if any error occured
-                errorName: null,
+                error: null,
 
                 // installation status
                 beetFound: null,
                 chainConnected: null,
-
-                // chain connectivity
 
                 // access to beet
                 beet: beeet,
@@ -33,12 +31,19 @@
 
                 ChainStore: ChainStore,
                 FetchChainObjects: FetchChainObjects,
+
+                connectOnCreate: true,
+                checkBeetOnCreate: true
             }
         },
         created: function () {
             setTimeout(()=>{
-                this.stateName = "ConnectingToChain";
-                this._connectToChainAndStart();
+                if (this.connectOnCreate) {
+                    this._connectToChainAndStart();
+                }
+                if (this.checkBeetOnCreate) {
+                    this._checkBeetInstallation();
+                }
             }, 1);
         },
         methods: {
@@ -49,7 +54,7 @@
             errored: function(error, message = "") {
                 console.log(error);
                 this.stateName = "Errored";
-                this.errorName = error;
+                this.error = error;
             },
             _checkBeetInstallation: function() {
                 this.beetFound = false;
@@ -80,13 +85,13 @@
              * connection to bitshares via bitsharesjs
              */
             _connectToChainAndStart: function () {
+                this.stateName = "ConnectingToChain";
                 // connection and then the ChainStore is initialized
                 this.chain.connect().then(() => {
                     this.chainConnected = true;
                     this.onConnected();
 
                     this.stateName = "CheckingBeetInstallation";
-                    this._checkBeetInstallation();
                 }).catch((err) => {
                     this.errored(err);
                     console.log("Connection attempt failed", err);
@@ -104,7 +109,6 @@
     }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
     a {
         color: #1E7EC8;
