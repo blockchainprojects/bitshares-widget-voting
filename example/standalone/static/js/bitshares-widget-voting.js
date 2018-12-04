@@ -56,6 +56,13 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAYAAABr
 
 /***/ }),
 
+/***/ "FicW":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "HKDv":
 /***/ (function(module, exports) {
 
@@ -63,14 +70,7 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAYAAABr
 
 /***/ }),
 
-/***/ "IlIi":
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-
-/***/ "KLpq":
+/***/ "HZzl":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
@@ -198,7 +198,7 @@ var chain_Blockchain = function () {
             // one is selected now, should probably be randomized
             this._apiInstance = cjs["Apis"].instance(this._nodes[idx], true);
             this._apiInstance.init_promise.then(function () {
-                es["a" /* ChainStore */].init().then(function () {
+                es["a" /* ChainStore */].init(false).then(function () {
                     // fetch now for quicker cashing
                     es["a" /* ChainStore */].fetchObject('2.1.0');
                     _this2._connectingInProgress = false;
@@ -443,6 +443,10 @@ var beeet = new beet_Beet();
             this.onBeetFound(status);
             this.stateName = "WaitingForBeet";
         },
+        _fetch: function _fetch(args) {
+            FetchChain: es["b" /* FetchChain */];
+        },
+
         /**
          * connection to bitshares via bitsharesjs
          */
@@ -471,14 +475,14 @@ var beeet = new beet_Beet();
 
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-051eea64","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidget.vue
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-7b21d5bc","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidget.vue
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c("div")}
 var staticRenderFns = []
 var esExports = { render: render, staticRenderFns: staticRenderFns }
 /* harmony default export */ var components_AbstractBitSharesWidget = (esExports);
 // CONCATENATED MODULE: ./src/components/AbstractBitSharesWidget.vue
 function injectStyle (ssrContext) {
-  __webpack_require__("IlIi")
+  __webpack_require__("FicW")
 }
 var normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -619,46 +623,57 @@ var Component = normalizeComponent(
         _resolveIdsOnChain: function _resolveIdsOnChain() {
             var _this2 = this;
 
+            var resolve_all = [];
+            var thiz = this;
             if (!!this.witnessIds && keys_default()(this.witnessIds).length > 0) {
-                this.chain.db_exec('get_objects', [keys_default()(this.witnessIds)]).then(function (chainObjects) {
-                    chainObjects.forEach(function (chainObject) {
-                        _this2.chain.db_exec('get_objects', [[chainObject.witness_account]]).then(function (accounts) {
-                            _this2.witnessIds[chainObject.id].voteId = chainObject.vote_id;
-                            _this2.witnessIds[chainObject.id].object = chainObject;
-                            _this2.witnessIds[chainObject.id].text = accounts[0].name;
-                            _this2.witnessIds[chainObject.id].voted = null;
-                            console.log("votable chain object found", _this2.witnessIds[chainObject.id]);
-                            _this2.onResolvedVotingId();
+                resolve_all.push(new promise_default.a(function (resolve) {
+                    thiz.chain.db_exec('get_objects', [keys_default()(thiz.witnessIds)]).then(function (chainObjects) {
+                        chainObjects.forEach(function (chainObject) {
+                            thiz.chain.db_exec('get_objects', [[chainObject.witness_account]]).then(function (accounts) {
+                                thiz.witnessIds[chainObject.id].voteId = chainObject.vote_id;
+                                thiz.witnessIds[chainObject.id].object = chainObject;
+                                thiz.witnessIds[chainObject.id].text = accounts[0].name;
+                                thiz.witnessIds[chainObject.id].voted = null;
+                                console.log("votable chain object found", thiz.witnessIds[chainObject.id]);
+                                resolve();
+                            });
                         });
                     });
-                });
+                }));
             }
             if (!!this.workerIds && keys_default()(this.workerIds).length > 0) {
-                this.chain.db_exec('get_objects', [keys_default()(this.workerIds)]).then(function (chainObjects) {
-                    chainObjects.forEach(function (chainObject) {
-                        _this2.workerIds[chainObject.id].voteId = chainObject.vote_for;
-                        _this2.workerIds[chainObject.id].object = chainObject;
-                        _this2.workerIds[chainObject.id].text = chainObject.name;
-                        _this2.workerIds[chainObject.id].voted = null;
-                        console.log("votable chain object found", _this2.workerIds[chainObject.id]);
+                resolve_all.push(new promise_default.a(function (resolve) {
+                    _this2.chain.db_exec('get_objects', [keys_default()(thiz.workerIds)]).then(function (chainObjects) {
+                        chainObjects.forEach(function (chainObject) {
+                            thiz.workerIds[chainObject.id].voteId = chainObject.vote_for;
+                            thiz.workerIds[chainObject.id].object = chainObject;
+                            thiz.workerIds[chainObject.id].text = chainObject.name;
+                            thiz.workerIds[chainObject.id].voted = null;
+                            console.log("votable chain object found", thiz.workerIds[chainObject.id]);
+                        });
+                        resolve();
                     });
-                    _this2.onResolvedVotingId();
-                });
+                }));
             }
             if (!!this.committeeIds && keys_default()(this.committeeIds).length > 0) {
-                this.chain.db_exec('get_objects', [keys_default()(this.committeeIds)]).then(function (chainObjects) {
-                    chainObjects.forEach(function (chainObject) {
-                        _this2.chain.db_exec('get_objects', [[chainObject.committee_account]]).then(function (accounts) {
-                            _this2.committeeIds[chainObject.id].voteId = chainObject.vote_for;
-                            _this2.committeeIds[chainObject.id].object = chainObject;
-                            _this2.committeeIds[chainObject.id].text = accounts[0].name;
-                            _this2.committeeIds[chainObject.id].voted = null;
-                            console.log("votable chain object found", _this2.committeeIds[chainObjects.id]);
-                            _this2.onResolvedVotingId();
+                resolve_all.push(new promise_default.a(function (resolve) {
+                    _this2.chain.db_exec('get_objects', [keys_default()(thiz.committeeIds)]).then(function (chainObjects) {
+                        chainObjects.forEach(function (chainObject) {
+                            thiz.chain.db_exec('get_objects', [[chainObject.committee_account]]).then(function (accounts) {
+                                thiz.committeeIds[chainObject.id].voteId = chainObject.vote_for;
+                                thiz.committeeIds[chainObject.id].object = chainObject;
+                                thiz.committeeIds[chainObject.id].text = accounts[0].name;
+                                thiz.committeeIds[chainObject.id].voted = null;
+                                console.log("votable chain object found", thiz.committeeIds[chainObjects.id]);
+                                resolve();
+                            });
                         });
                     });
-                });
+                }));
             }
+            promise_default.a.all(resolve_all).then(function () {
+                thiz.onResolvedVotingId();
+            });
         },
         onBeetFound: function onBeetFound(status) {
             var _this3 = this;
@@ -742,14 +757,14 @@ var Component = normalizeComponent(
         }
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-4c599ff2","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidgetVoting.vue
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-6a472496","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidgetVoting.vue
 var AbstractBitSharesWidgetVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c("div")}
 var AbstractBitSharesWidgetVoting_staticRenderFns = []
 var AbstractBitSharesWidgetVoting_esExports = { render: AbstractBitSharesWidgetVoting_render, staticRenderFns: AbstractBitSharesWidgetVoting_staticRenderFns }
 /* harmony default export */ var components_AbstractBitSharesWidgetVoting = (AbstractBitSharesWidgetVoting_esExports);
 // CONCATENATED MODULE: ./src/components/AbstractBitSharesWidgetVoting.vue
 function AbstractBitSharesWidgetVoting_injectStyle (ssrContext) {
-  __webpack_require__("KLpq")
+  __webpack_require__("HZzl")
 }
 var AbstractBitSharesWidgetVoting_normalizeComponent = __webpack_require__("VU/8")
 /* script */
