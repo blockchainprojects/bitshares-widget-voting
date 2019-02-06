@@ -1,6 +1,6 @@
 {
   "name": "bitshares-widget-voting",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "BitShares Widget for Voting",
   "author": "Stefan Schiessl <stefan.schiessl@blockchainprojectsbv.com>",
   "private": true,

@@ -28,20 +28,9 @@ class Beet {
         let _connect = () => {
             let thiz = this;
             return new Promise((resolve, reject) => {
-                thiz._beet.init("BitShares Voting Widget").then(identities => {
-                    if (identities.length == 0) {
-                        thiz._beet.connect().then(res => {
-                            thiz._beet.link('BTS').then(res => {
-                                res.beet = thiz._beet;
-                                resolve(res);
-                            });
-                        }).catch(reject);
-                    } else {
-                        thiz._beet.connect(identities[0]).then(res => {
-                            res.beet = thiz._beet;
-                            resolve(res);
-                        }).catch(reject);
-                    }
+                thiz._beet.initAndConnect("BitShares Voting Widget", "BTS").then(res => {
+                    res.beet = thiz._beet;
+                    resolve(res);
                 }).catch(reject);
             });
         };
