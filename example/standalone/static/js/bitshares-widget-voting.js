@@ -184,7 +184,7 @@ var chain_Blockchain = function () {
             // one is selected now, should probably be randomized
             this._apiInstance = cjs["Apis"].instance(this._nodes[idx], true);
             this._apiInstance.init_promise.then(function () {
-                es["a" /* ChainStore */].init().then(function () {
+                es["a" /* ChainStore */].init(false).then(function () {
                     // fetch now for quicker cashing
                     es["a" /* ChainStore */].fetchObject('2.1.0');
                     _this2._connectingInProgress = false;
