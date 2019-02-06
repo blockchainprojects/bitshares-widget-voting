@@ -58,7 +58,7 @@ class Blockchain {
         // one is selected now, should probably be randomized
         this._apiInstance = Apis.instance(this._nodes[idx], true);
         this._apiInstance.init_promise.then(() => {
-            ChainStore.init().then(() => {
+            ChainStore.init(false).then(() => {
                 // fetch now for quicker cashing
                 ChainStore.fetchObject('2.1.0');
                 this._connectingInProgress = false;
