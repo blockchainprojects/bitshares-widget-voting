@@ -1,7 +1,7 @@
 <template>
     <div class="widget-voting--tiles">
-        <div v-if="objectIds">
-            <div class="widget-voting--tiles--title" v-on:click="showPopup"><h2>BitShares Widget for Voting</h2></div>
+        <div v-if="workerIds">
+            <div v-if="layout == 'tiles'" class="widget-voting--tiles--title" v-on:click="showPopup"><h2>BitShares Widget for Voting</h2></div>
             <div class="widget-voting--popup" v-show="isPopupVisible">
                 <div class="widget-voting--popup--content">
                     <div class="widget-voting--tiles--popup-message">{{ popupMessage }}</div>

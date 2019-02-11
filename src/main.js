@@ -47,7 +47,7 @@ for (i = 0; i < 11; i++) {
                 try {
                     this.layoutfromdiv = this.$el.attributes["layout"].value;
                 } catch (err) {
-                    this.layoutfromdiv = false;
+                    this.layoutfromdiv = "tiles";
                 }
                 this.idName = idName;
                 this.innerHTML = this.$el.innerHTML;

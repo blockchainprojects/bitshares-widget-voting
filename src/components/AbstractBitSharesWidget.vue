@@ -7,7 +7,6 @@
     import {ChainStore, FetchChainObjects, FetchChain} from 'bitsharesjs/es'
     import BitSharesWorker from './BitSharesWorker'
 
-
     export default {
         name: 'AbstractBitSharesWidget',
         props: [],
