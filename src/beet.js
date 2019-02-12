@@ -5,9 +5,6 @@ class Beet {
     constructor() {
         this._beet = beet;
         this._buffer = {};
-
-        this._isConnected = false;
-        this._isInstalled = null;
     }
 
     isInstalled() {
@@ -15,14 +12,8 @@ class Beet {
             let _tmp = new BufferedExecution(this._beet.isInstalled.bind(this._beet))
             this._buffer.isInstalled = _tmp;
         }
-        if (this._isInstalled != null) {
-            return new Promise(resolve => {
-                resolve(this._isInstalled)
-            })
-        } else {
-            let buffer = this._buffer.isInstalled;
-            return buffer.execute();
-        }
+        let buffer = this._buffer.isInstalled;
+        return buffer.execute();
     }
 
     noBuffer() {
@@ -43,15 +34,7 @@ class Beet {
             let _tmp = new BufferedExecution(_connect.bind(this));
             this._buffer.connect = _tmp;
         }
-        if (this._isConnected) {
-            // if its already connected, just return the instance
-            return new Promise(resolve => {
-                resolve(this._beet);
-            });
-        } else {
-            // trigger or queue for connection
-            return this._buffer.connect.execute();
-        }
+        return this._buffer.connect.execute();
     }
 
 }
@@ -65,6 +48,8 @@ class BufferedExecution {
         this._rejects = [];
 
         this._actualCall = actualCall;
+
+        this._result = null;
     }
 
     execute() {
@@ -74,15 +59,26 @@ class BufferedExecution {
                 this._rejects.push(reject);
             });
         } else {
-            return new Promise((resolve, reject) => {
-                this._resolves.push(resolve);
-                this._rejects.push(reject);
-                this._actuallyExecute();
-            });
+            this._executionInProgress = true;
+            if (this._result != null) {
+                return new Promise((resolve, reject) => {
+                    this._resolves.push(resolve);
+                    this._rejects.push(reject);
+                    this._onResolve(this._result);
+                });
+            } else {
+                return new Promise((resolve, reject) => {
+                    this._resolves.push(resolve);
+                    this._rejects.push(reject);
+                    this._actuallyExecute();
+                });
+            }
         }
     }
 
     _onResolve(argument) {
+        this._executionInProgress = false;
+        this._result = argument;
         this._resolves.forEach((resolve) => {
             resolve(argument);
         });
@@ -90,6 +86,7 @@ class BufferedExecution {
     }
 
     _onError(err) {
+        this._executionInProgress = false;
         this._rejects.forEach((reject) => {
             reject(err);
         });

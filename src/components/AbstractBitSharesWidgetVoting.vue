@@ -111,7 +111,6 @@
                                 this.witnessIds[chainObject.id].object = chainObject;
                                 this.witnessIds[chainObject.id].text = accounts[0].name;
                                 this.witnessIds[chainObject.id].voted = null;
-                                console.log("votable chain object found", this.witnessIds[chainObject.id]);
                                 this.onResolvedVotingId();
                             });
                         });
@@ -124,7 +123,6 @@
                             this.workerIds[chainObject.id].object = chainObject;
                             this.workerIds[chainObject.id].text = chainObject.name;
                             this.workerIds[chainObject.id].voted = null;
-                            console.log("votable chain object found", this.workerIds[chainObject.id]);
                         });
                         this.onResolvedVotingId();
                     });
@@ -137,7 +135,6 @@
                                 this.committeeIds[chainObject.id].object = chainObject;
                                 this.committeeIds[chainObject.id].text = accounts[0].name;
                                 this.committeeIds[chainObject.id].voted = null;
-                                console.log("votable chain object found", this.committeeIds[chainObjects.id]);
                                 this.onResolvedVotingId();
                             });
                         });
