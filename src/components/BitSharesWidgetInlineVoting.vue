@@ -31,12 +31,12 @@
 </template>
 
 <script>
-    import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
+    import AbstractWidgetResolving from './AbstractWidgetResolving'
     import BCPCopyright from './BCPCopyright'
 
     export default {
         name: 'BitSharesWidgetInlineVoting',
-        extends: AbstractBitSharesWidgetVoting,
+        extends: AbstractWidgetResolving,
         components: {
             BCPCopyright
         },
@@ -44,41 +44,20 @@
             return {
                 text: this.innerHTML, // initialize with given text
                 popUpText: "Loading ...",
-
+                isPopupVisible: false,
                 votingObject: null
             }
         },
         methods: {
+            showPopup: function() {
+                this.isPopupVisible = !this.isPopupVisible;
+            },
             showVotingObject() {
+                this.votingObject = this.objectIds[0];
                 this.text = this.votingObject.text;
                 this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
             },
-            onResolvedVotingProps: function() {
-                let uniqueIdList = null;
-                if (!!this.witnessIds && Object.keys(this.witnessIds).length == 1) {
-                    uniqueIdList = this.witnessIds;
-                }
-                if (!!this.workerIds && Object.keys(this.workerIds).length == 1) {
-                    if (uniqueIdList != null) {
-                        this.text = "Please do only provide one object type for voting"
-                    } else {
-                        uniqueIdList = this.workerIds;
-                    }
-                }
-                if (!!this.committeeIds && Object.keys(this.committeeIds).length == 1) {
-                    if (uniqueIdList != null) {
-                        this.text = "Please do only provide one object type for voting"
-                    } else {
-                        uniqueIdList = this.committeeIds;
-                    }
-                }
-                if (uniqueIdList == null) {
-                    this.text = "Please provide exactly one object type for voting";
-                    this.errored("Initializing failed");
-                }
-                this.votingObject = uniqueIdList[Object.keys(uniqueIdList)[0]];
-            },
-            onResolvedVotingId: function() {
+            onVotingObjectsUpdate: function() {
                 this.showVotingObject();
             }
         }

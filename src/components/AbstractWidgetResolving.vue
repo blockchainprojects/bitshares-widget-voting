@@ -14,7 +14,6 @@
         data() {
             return {
                 objectIds: null,
-                isPopupVisible: false,
 
                 resolveIdsFromPropsOnCreate: true,
                 resolveIdsFromChainOnConnected: true
@@ -40,11 +39,8 @@
             onObjectsUpdate: function() {
                 // overwrite
             },
-            showPopup: function() {
-                this.isPopupVisible = !this.isPopupVisible;
-            },
             _resolveIdsFromProps: function () {
-                if (typeof this.objectid === 'string' && this.witnessid !== "" ) {
+                if (typeof this.objectid === 'string' && this.objectid !== "" ) {
                     this.objectIds = {};
 
                     this.objectid.split(";").forEach((item) => {
@@ -72,13 +68,13 @@
                     // witness
                     return new Promise((resolve) => {
                         thiz.chain.db_exec('get_objects', [ids]).then((chainObjects) => {
+                            let all_promises = [];
                             chainObjects.forEach((chainObject) => {
                                 thiz.chain.db_exec('get_objects', [[chainObject.witness_account]]).then((accounts) => {
                                     thiz.objectIds[chainObject.id].voteId = chainObject.vote_id;
                                     thiz.objectIds[chainObject.id].object = chainObject;
                                     thiz.objectIds[chainObject.id].text = accounts[0].name;
                                     thiz.objectIds[chainObject.id].voted = null;
-                                    console.log("votable chain object found", thiz.objectIds[chainObject.id]);
                                     resolve();
                                 });
                             });
@@ -92,7 +88,6 @@
                                 thiz.objectIds[chainObject.id].object = chainObject;
                                 thiz.objectIds[chainObject.id].text = chainObject.name;
                                 thiz.objectIds[chainObject.id].voted = null;
-                                console.log("votable chain object found", thiz.objectIds[chainObject.id]);
                             });
                             resolve();
                         });
@@ -106,7 +101,6 @@
                                     thiz.objectIds[chainObject.id].object = chainObject;
                                     thiz.objectIds[chainObject.id].text = accounts[0].name;
                                     thiz.objectIds[chainObject.id].voted = null;
-                                    console.log("votable chain object found", thiz.objectIds[chainObjects.id]);
                                     resolve();
                                 });
                             });
@@ -129,7 +123,7 @@
                     idsPerType[value.type].push(key);
                 });
                 idsPerType.forEach((key,value) => {
-                    resolve_all.push(this._getOnChainResolvePromise(key, value));
+                    resolve_all.push(thiz._getOnChainResolvePromise(key, value));
                 });
                 Promise.all(resolve_all).then(() => {
                     thiz.onResolvedIdFromChain();
@@ -158,9 +152,7 @@
                     }).then((account) => {
                         account = account.toJS();
                         if (voteId == null) {
-                            thiz._checkIfVotedObjects(account, thiz.witnessIds);
-                            thiz._checkIfVotedObjects(account, thiz.workerIds);
-                            thiz._checkIfVotedObjects(account, thiz.committeeIds);
+                            thiz._checkIfVotedObjects(account, thiz.objectIds);
                             resolve();
                         } else {
                             let voted = !(account.options.votes.indexOf(voteId) == -1);
@@ -179,8 +171,8 @@
                     } else {
                         objectIds[key].voted = true;
                     }
-                    this.onVotingObjectsUpdate();
                 }
+                this.onVotingObjectsUpdate();
             },
             vote: function (votingObject) {
                 let thiz = this;
@@ -217,19 +209,4 @@
 </script>
 
 <style>
-    .widget-voting--popup {
-        display: inline;
-        position: absolute;
-        min-width: 13em;
-        border-bottom: 6px solid #000;
-        border-width: thin;
-        border-style: solid;
-        border-color: rgba(0, 0, 0, 0.23);
-        background: white;
-        color: black;
-        border-radius: 16px;
-        padding: 5px 10px 4px;
-        box-shadow: 5px 10px 18px rgba(25, 25, 25, 0.27);
-        font-size:0.9em;
-    }
 </style>
