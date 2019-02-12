@@ -114,7 +114,6 @@
                                     thiz.witnessIds[chainObject.id].object = chainObject;
                                     thiz.witnessIds[chainObject.id].text = accounts[0].name;
                                     thiz.witnessIds[chainObject.id].voted = null;
-                                    console.log("votable chain object found", thiz.witnessIds[chainObject.id]);
                                     resolve();
                                 });
                             });
@@ -130,7 +129,6 @@
                                 thiz.workerIds[chainObject.id].object = chainObject;
                                 thiz.workerIds[chainObject.id].text = chainObject.name;
                                 thiz.workerIds[chainObject.id].voted = null;
-                                console.log("votable chain object found", thiz.workerIds[chainObject.id]);
                             });
                             resolve();
                         });
@@ -145,7 +143,6 @@
                                     thiz.committeeIds[chainObject.id].object = chainObject;
                                     thiz.committeeIds[chainObject.id].text = accounts[0].name;
                                     thiz.committeeIds[chainObject.id].voted = null;
-                                    console.log("votable chain object found", thiz.committeeIds[chainObjects.id]);
                                     resolve();
                                 });
                             });

@@ -119,12 +119,12 @@ export default {
                         loadingDone();
                     }).catch((err) => {
                         // could not load escrow details
-                        console.log(err);
+                        console.error(err);
                         loadingDone();
                     })
                 }).catch((err) => {
                     // could not load escrow details
-                    console.log(err);
+                    console.error(err);
                     loadingDone();
                 })
             } else {

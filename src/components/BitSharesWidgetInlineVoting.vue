@@ -52,7 +52,6 @@
             showVotingObject() {
                 this.text = this.votingObject.text;
                 this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
-                console.log(this.votingObject)
             },
             onResolvedVotingProps: function() {
                 let uniqueIdList = null;

@@ -46,7 +46,7 @@
                 this.beetFound = true;
             },
             errored: function(error, message = "") {
-                console.log(error);
+                console.error(error);
                 this.stateName = "Errored";
                 this.errorName = error;
             },
@@ -88,7 +88,7 @@
                     this._checkBeetInstallation();
                 }).catch((err) => {
                     this.errored(err);
-                    console.log("Connection attempt failed", err);
+                    console.error("Connection attempt failed", err);
                     this.chainConnected = false;
                 });
             },
