@@ -19,14 +19,10 @@
                 resolveIdsFromChainOnConnected: true
             }
         },
-        beforeMount: function() {
-            if (this.resolveIdsFromPropsOnCreate) {
-                this._resolveIdsFromProps();
-            }
-        },
         methods: {
             onConnected: function() {
                 if (this.resolveIdsFromChainOnConnected) {
+                    this._resolveIdsFromProps();
                     this._resolveIdsOnChain();
                 }
             },
@@ -36,7 +32,7 @@
             onResolvedIdFromProps: function() {
                 // overwrite
             },
-            onObjectsUpdate: function() {
+            onVotingObjectsUpdate: function() {
                 // overwrite
             },
             _resolveIdsFromProps: function () {
@@ -59,6 +55,8 @@
                     } else {
                         this.objectIds = this.objectid;
                     }
+                } else {
+                    throw "Widget needs objectid props"
                 }
                 this.onResolvedIdFromProps();
             },
@@ -116,7 +114,7 @@
 
                 // sort same types together
                 let idsPerType = {};
-                this.witnessIds.forEach((key,value) => {
+                this.objectIds.forEach((key,value) => {
                     if (!(value.type in idsPerType)) {
                         idsPerType[value.type] = []
                     }
@@ -125,7 +123,9 @@
                 idsPerType.forEach((key,value) => {
                     resolve_all.push(thiz._getOnChainResolvePromise(key, value));
                 });
+                console.log("before fail?")
                 Promise.all(resolve_all).then(() => {
+                    console.log("before fail?")
                     thiz.onResolvedIdFromChain();
                 });
             },

@@ -43,7 +43,6 @@ import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
 
 export default {
     name: 'BitSharesWorker',
-    extends: AbstractBitSharesWidgetVoting,
     data () {
         return {
             starts_in: null,

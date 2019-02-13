@@ -5,8 +5,6 @@
     import chain from '../chain'
     import beeet from '../beet'
     import {ChainStore, FetchChainObjects, FetchChain} from 'bitsharesjs/es'
-    import BitSharesWorker from './BitSharesWorker'
-
 
     export default {
         name: 'AbstractWidget',
@@ -37,14 +35,12 @@
             }
         },
         created: function () {
-            setTimeout(()=>{
-                if (this.connectOnCreate) {
-                    this._connectToChainAndStart();
-                }
-                if (this.checkBeetOnCreate) {
-                    this._checkBeetInstallation();
-                }
-            }, 1);
+            if (this.connectOnCreate) {
+                this._connectToChainAndStart();
+            }
+            if (this.checkBeetOnCreate) {
+                this._checkBeetInstallation();
+            }
         },
         methods: {
             goToBeet() {
@@ -52,7 +48,7 @@
                 this.beetFound = true;
             },
             errored: function(error, message = "") {
-                console.log(error);
+                console.error(error);
                 this.stateName = "Errored";
                 this.error = error;
             },
@@ -87,14 +83,15 @@
             _connectToChainAndStart: function () {
                 this.stateName = "ConnectingToChain";
                 // connection and then the ChainStore is initialized
+                console.log("before fail?")
                 this.chain.connect().then(() => {
+                    console.log("before fail?")
                     this.chainConnected = true;
                     this.onConnected();
 
                     this.stateName = "CheckingBeetInstallation";
                 }).catch((err) => {
-                    this.errored(err);
-                    console.log("Connection attempt failed", err);
+                    this.errored("Connection attempt failed: " + err);
                     this.chainConnected = false;
                 });
             },

@@ -55,6 +55,7 @@
             showVotingObject() {
                 this.votingObject = this.objectIds[0];
                 this.text = this.votingObject.text;
+                console.log("before fail?")
                 this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
             },
             onVotingObjectsUpdate: function() {
