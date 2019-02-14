@@ -114,18 +114,18 @@
 
                 // sort same types together
                 let idsPerType = {};
-                this.objectIds.forEach((key,value) => {
+                Object.keys(this.objectIds).forEach(key => {
+                    let value = this.objectIds[key];
                     if (!(value.type in idsPerType)) {
                         idsPerType[value.type] = []
                     }
                     idsPerType[value.type].push(key);
                 });
-                idsPerType.forEach((key,value) => {
+                Object.keys(idsPerType).forEach(key => {
+                    let value = idsPerType[key];
                     resolve_all.push(thiz._getOnChainResolvePromise(key, value));
                 });
-                console.log("before fail?")
                 Promise.all(resolve_all).then(() => {
-                    console.log("before fail?")
                     thiz.onResolvedIdFromChain();
                 });
             },

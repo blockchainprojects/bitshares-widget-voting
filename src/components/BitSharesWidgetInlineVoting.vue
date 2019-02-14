@@ -4,7 +4,7 @@
         <div class="widget-voting--popup" v-show="isPopupVisible">
             <div class="widget-voting--popup--content">
                 <div class="title">
-                    <a v-if="votingObject.object != null" :href="'http://bitshares-explorer.io/#/objects/' + votingObject.object.id" target="_blank">
+                    <a v-if="votingObject != null && votingObject.object != null" :href="'http://bitshares-explorer.io/#/objects/' + votingObject.object.id" target="_blank">
                         {{ popUpText }}
                     </a>
                     <template v-else>
@@ -53,10 +53,14 @@
                 this.isPopupVisible = !this.isPopupVisible;
             },
             showVotingObject() {
-                this.votingObject = this.objectIds[0];
-                this.text = this.votingObject.text;
-                console.log("before fail?")
+                this.votingObject = Object.assign({}, this.objectIds[Object.keys(this.objectIds)[0]]);
                 this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
+                if (!!this.votingObject.text) {
+                    this.text = this.votingObject.text;
+                }
+            },
+            onResolvedIdFromChain: function() {
+                this.showVotingObject();
             },
             onVotingObjectsUpdate: function() {
                 this.showVotingObject();

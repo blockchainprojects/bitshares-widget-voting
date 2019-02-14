@@ -9,7 +9,7 @@ Vue.config.productionTip = false;
  * This renders the Vue app in the HTML element bitshares-widget-voting.
  *
  * The App.vue serves as middleware that can enable routing if required.
- * The pricesfromdiv property is filled with the markets property from
+ * The fromdiv properties are filled with the properties from
  * the div tag in index.html and passed forward, see App.vue
  *
  */
@@ -26,23 +26,13 @@ for (i = 0; i < 11; i++) {
     if (!!element) {
         new Vue({
             el: element,
-            template: '<App :workeridfromdiv="workeridfromdiv" :witnessidfromdiv="witnessidfromdiv" :committeefromdiv="committeefromdiv" :layoutfromdiv="layoutfromdiv" :innerHTML="innerHTML" />',
+            template: '<App :objectidfromdiv="objectidfromdiv" :layoutfromdiv="layoutfromdiv" :innerHTML="innerHTML" />',
             components: {App},
             beforeMount: function () {
                 try {
-                    this.workeridfromdiv = this.$el.attributes["workerid"].value;
+                    this.objectidfromdiv = this.$el.attributes["objectid"].value;
                 } catch (err) {
-                    this.workeridfromdiv = ""
-                }
-                try {
-                    this.witnessidfromdiv = this.$el.attributes["witnessid"].value;
-                } catch (err) {
-                    this.witnessidfromdiv = ""
-                }
-                try {
-                    this.committeefromdiv = this.$el.attributes["committeeid"].value;
-                } catch (err) {
-                    this.committeefromdiv = ""
+                    this.objectidfromdiv = ""
                 }
                 try {
                     this.layoutfromdiv = this.$el.attributes["layout"].value;
@@ -52,7 +42,6 @@ for (i = 0; i < 11; i++) {
                 this.idName = idName;
                 this.innerHTML = this.$el.innerHTML;
             },
-
         });
     }
 }

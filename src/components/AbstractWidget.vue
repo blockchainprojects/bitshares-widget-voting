@@ -80,20 +80,18 @@
             /**
              * connection to bitshares via bitsharesjs
              */
-            _connectToChainAndStart: function () {
+            _connectToChainAndStart: async function () {
                 this.stateName = "ConnectingToChain";
-                // connection and then the ChainStore is initialized
-                console.log("before fail?")
-                this.chain.connect().then(() => {
-                    console.log("before fail?")
+                try {
+                    // connection and then the ChainStore is initialized
+                    await this.chain.connect();
                     this.chainConnected = true;
                     this.onConnected();
-
                     this.stateName = "CheckingBeetInstallation";
-                }).catch((err) => {
-                    this.errored("Connection attempt failed: " + err);
+                } finally {
+                    //this.errored("Connection attempt failed: " + err);
                     this.chainConnected = false;
-                });
+                }
             },
             onBeetFound: function(status) {
                 // may be overwritten
