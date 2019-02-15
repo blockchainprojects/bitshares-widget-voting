@@ -93,13 +93,26 @@
                     this.chainConnected = false;
                 }
             },
-            onBeetFound: function(status) {
-                // may be overwritten
+            onBeetFound: function (status) {
+                if (status) {
+                    // check voting status
+                    let thiz = this;
+                    this.beet.connect().then(connected => {
+                        if (connected) {
+                            thiz.onBeetConnected(connected.account_id);
+                        } else {
+                            this.errored("Connection to Beet could not be established");
+                            this.setBeetInstallationStatus(false);
+                        }
+                    });
+                }
             },
             onConnected: function(status) {
                 // may be overwritten
+            },
+            onBeetConnected: function(account) {
+                // may be overwritten
             }
-
         }
     }
 </script>
