@@ -4,7 +4,7 @@
         <div class="widget-voting--popup" v-show="isPopupVisible">
             <div class="widget-voting--popup--content">
                 <div class="title">
-                    <a v-if="votingObject.object != null" :href="'http://bitshares-explorer.io/#/objects/' + votingObject.object.id" target="_blank">
+                    <a v-if="votingObject != null && votingObject.object != null" :href="'http://bitshares-explorer.io/#/objects/' + votingObject.object.id" target="_blank">
                         {{ popUpText }}
                     </a>
                     <template v-else>
@@ -31,12 +31,12 @@
 </template>
 
 <script>
-    import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
+    import AbstractWidgetResolvingVoting from './AbstractWidgetResolvingVoting'
     import BCPCopyright from './BCPCopyright'
 
     export default {
         name: 'BitSharesWidgetInlineVoting',
-        extends: AbstractBitSharesWidgetVoting,
+        extends: AbstractWidgetResolvingVoting,
         components: {
             BCPCopyright
         },
@@ -44,41 +44,25 @@
             return {
                 text: this.innerHTML, // initialize with given text
                 popUpText: "Loading ...",
-
+                isPopupVisible: false,
                 votingObject: null
             }
         },
         methods: {
+            showPopup: function() {
+                this.isPopupVisible = !this.isPopupVisible;
+            },
             showVotingObject() {
-                this.text = this.votingObject.text;
+                this.votingObject = Object.assign({}, this.objectIds[Object.keys(this.objectIds)[0]]);
                 this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
+                if (!!this.votingObject.text) {
+                    this.text = this.votingObject.text;
+                }
             },
-            onResolvedVotingProps: function() {
-                let uniqueIdList = null;
-                if (!!this.witnessIds && Object.keys(this.witnessIds).length == 1) {
-                    uniqueIdList = this.witnessIds;
-                }
-                if (!!this.workerIds && Object.keys(this.workerIds).length == 1) {
-                    if (uniqueIdList != null) {
-                        this.text = "Please do only provide one object type for voting"
-                    } else {
-                        uniqueIdList = this.workerIds;
-                    }
-                }
-                if (!!this.committeeIds && Object.keys(this.committeeIds).length == 1) {
-                    if (uniqueIdList != null) {
-                        this.text = "Please do only provide one object type for voting"
-                    } else {
-                        uniqueIdList = this.committeeIds;
-                    }
-                }
-                if (uniqueIdList == null) {
-                    this.text = "Please provide exactly one object type for voting";
-                    this.errored("Initializing failed");
-                }
-                this.votingObject = uniqueIdList[Object.keys(uniqueIdList)[0]];
+            onResolvedIdFromChain: function() {
+                this.showVotingObject();
             },
-            onResolvedVotingId: function() {
+            onVotingObjectsUpdate: function() {
                 this.showVotingObject();
             }
         }

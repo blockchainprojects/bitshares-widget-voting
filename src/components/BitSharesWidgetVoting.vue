@@ -1,6 +1,6 @@
 <template>
     <div class="widget-voting--tiles">
-        <div v-if="workerIds">
+        <div v-if="objectIds">
             <div v-if="layout == 'tiles'" class="widget-voting--tiles--title" v-on:click="showPopup"><h2>BitShares Widget for Voting</h2></div>
             <div class="widget-voting--popup" v-show="isPopupVisible">
                 <div class="widget-voting--popup--content">
@@ -10,8 +10,8 @@
             <br/>
             <div v-if="loadingMessage" class="widget-voting--tiles--loading-message">{{ loadingMessage }}</div>
             <div v-else>
-                <div class="widget-voting--tiles--tile" v-for="worker in workerIds">
-                    <BitSharesWorker :workerid="worker"/>
+                <div class="widget-voting--tiles--tile" v-for="object in objectIds">
+                    <BitSharesWorker :objectid="object"/>
                 </div>
             </div>
         </div>
@@ -19,16 +19,17 @@
 </template>
 
 <script>
+    import AbstractWidgetResolvingVoting from './AbstractWidgetResolvingVoting'
+
     import {FetchChain} from 'bitsharesjs/es'
 
     import BitSharesWorker from './BitSharesWorker'
-    import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
     import BCPCopyright from './BCPCopyright'
 
     export default {
         name: 'BitSharesWidgetVoting',
         props: ['layout'],
-        extends: AbstractBitSharesWidgetVoting,
+        extends: AbstractWidgetResolvingVoting,
         components: {
             BitSharesWorker,
             BCPCopyright
@@ -41,10 +42,15 @@
                 currentTime: this.getFormattedTime(),
 
                 // tooltip that is displayed on hover
-                popupMessage: ""
+                popupMessage: "",
+
+                isPopupVisible: false,
             }
         },
         methods: {
+            showPopup: function() {
+                this.isPopupVisible = !this.isPopupVisible;
+            },
             /**
              * general information about the blockchain
              * @returns {*}
@@ -69,19 +75,15 @@
                 let currentDate = new Date();
                 return currentDate.getHours() + ':' + ('0' + currentDate.getMinutes()).slice(-2)
             },
-            onConnected: function() {
+            onResolvedIdFromChain: function() {
                 this.getHeadMessage().then(message => {
                     this.popupMessage = message;
+                    this.loadingMessage = null;
                 });
             },
-            /**
-             * Loads the next message and displays it, also updates the tooltip
-             */
-            onResolvedVotingProps: function () {
-                if (!!this.workerIds) {
-                    this.loadingMessage = null;
-                }
-            },
+            onVotingObjectsUpdate: function() {
+                this.showVotingObject();
+            }
         }
     }
 </script>

@@ -65,6 +65,9 @@ class Blockchain {
                 this._connected = true;
                 resolve();
                 this._onConnect();
+            }).catch((err) => {
+                reject(err);
+                this._onError();
             });
         }).catch((err) => {
             idx = idx + 1;

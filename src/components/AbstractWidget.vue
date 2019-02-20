@@ -4,11 +4,10 @@
 <script>
     import chain from '../chain'
     import beeet from '../beet'
-    import {ChainStore, FetchChainObjects} from 'bitsharesjs/es'
-    import BitSharesWorker from './BitSharesWorker'
+    import {ChainStore, FetchChainObjects, FetchChain} from 'bitsharesjs/es'
 
     export default {
-        name: 'AbstractBitSharesWidget',
+        name: 'AbstractWidget',
         props: [],
         data() {
             return {
@@ -16,13 +15,11 @@
                 stateName: "Initializing",
 
                 // if any error occured
-                errorName: null,
+                error: null,
 
                 // installation status
                 beetFound: null,
                 chainConnected: null,
-
-                // chain connectivity
 
                 // access to beet
                 beet: beeet,
@@ -32,13 +29,18 @@
 
                 ChainStore: ChainStore,
                 FetchChainObjects: FetchChainObjects,
+
+                connectOnCreate: true,
+                checkBeetOnCreate: true
             }
         },
         created: function () {
-            setTimeout(()=>{
-                this.stateName = "ConnectingToChain";
+            if (this.connectOnCreate) {
                 this._connectToChainAndStart();
-            }, 1);
+            }
+            if (this.checkBeetOnCreate) {
+                this._checkBeetInstallation();
+            }
         },
         methods: {
             goToBeet() {
@@ -48,7 +50,7 @@
             errored: function(error, message = "") {
                 console.error(error);
                 this.stateName = "Errored";
-                this.errorName = error;
+                this.error = error;
             },
             _checkBeetInstallation: function() {
                 this.beetFound = false;
@@ -72,35 +74,49 @@
                 this.onBeetFound(status);
                 this.stateName = "WaitingForBeet";
             },
+            _fetch(args) {
+                FetchChain: FetchChain
+            },
             /**
              * connection to bitshares via bitsharesjs
              */
-            _connectToChainAndStart: function () {
-                // connection and then the ChainStore is initialized
-                this.chain.connect().then(() => {
+            _connectToChainAndStart: async function () {
+                this.stateName = "ConnectingToChain";
+                try {
+                    // connection and then the ChainStore is initialized
+                    await this.chain.connect();
                     this.chainConnected = true;
                     this.onConnected();
-
                     this.stateName = "CheckingBeetInstallation";
-                    this._checkBeetInstallation();
-                }).catch((err) => {
-                    this.errored(err);
-                    console.error("Connection attempt failed", err);
+                } finally {
+                    //this.errored("Connection attempt failed: " + err);
                     this.chainConnected = false;
-                });
+                }
             },
-            onBeetFound: function(status) {
-                // may be overwritten
+            onBeetFound: function (status) {
+                if (status) {
+                    // check voting status
+                    let thiz = this;
+                    this.beet.connect().then(connected => {
+                        if (connected) {
+                            thiz.onBeetConnected(connected.account_id);
+                        } else {
+                            this.errored("Connection to Beet could not be established");
+                            this.setBeetInstallationStatus(false);
+                        }
+                    });
+                }
             },
             onConnected: function(status) {
                 // may be overwritten
+            },
+            onBeetConnected: function(account) {
+                // may be overwritten
             }
-
         }
     }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
     a {
         color: #1E7EC8;

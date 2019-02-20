@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loading" class="worker">
-    <h3>Worker: {{votingObject.id}} - {{votingObject.title}}</h3>
+    <h3>Worker: {{worker.id}} - {{worker.name}}</h3>
     <div v-if="receives" class="status">
       <div v-if="receives.daily.float > 0">Status: Active</div>
       <div v-else>Status: Inactive</div>
@@ -14,18 +14,18 @@
     </div>
     <div class="funding">
       <div v-if="current_in_USD">
-          Funds: <a :href="'https://workers.bitshares.foundation/' + votingObject.name" target="_blank">{{ Math.round(current_in_USD.float).toLocaleString() }} / {{ Math.round(asked_in_USD.float).toLocaleString() }} (USD)</a>
+          Funds: <a :href="'https://workers.bitshares.foundation/' + worker.name" target="_blank">{{ Math.round(current_in_USD.float).toLocaleString() }} / {{ Math.round(asked_in_USD.float).toLocaleString() }} (USD)</a>
       </div>
       <div v-else>
-          Funds: <a :href="'http://bitshares-explorer.io/#/accounts/' + votingObject.object.worker_account" target="_blank">{{ votingObject.object.worker_account }}</a>
+          Funds: <a :href="'http://bitshares-explorer.io/#/accounts/' + worker.worker_account" target="_blank">{{ worker.worker_account }}</a>
       </div>
     </div>
     <div class="votes">
-      Votes: {{ Math.round(votingObject.object.total_votes_for / 100000).toLocaleString() }} BTS
+      Votes: {{ Math.round(worker.total_votes_for / 100000).toLocaleString() }} BTS
     </div>
     <div class="voting" v-if="votingObject != null">
       <div v-if="!!votingObject.failed" class="done">Voting failed</div>
-      <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
+      <div v-if="votingObject.voted || voted" class="done">Voted &#10004;</div>
       <template v-else>
           <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
           <template v-else>
@@ -39,37 +39,53 @@
 
 <script>
 import {FetchChain} from 'bitsharesjs/es'
-import AbstractWidgetResolvingVoting from './AbstractWidgetResolvingVoting'
+import AbstractBitSharesWidgetVoting from './AbstractBitSharesWidgetVoting'
 
 export default {
     name: 'BitSharesWorker',
-    extends: AbstractWidgetResolvingVoting,
+    extends: AbstractBitSharesWidgetVoting,
     data () {
         return {
-            starts_in: null,
-            ends_in: null,
-            current_in_USD: null,
-            asked_in_USD: null,
-            receives: null,
-
-            loading: true,
-
-            votingObject: null,
-
+            voted: false,
             FetchChain: FetchChain
     }
     },
     methods: {
         onVotingObjectsUpdate() {
-            this.votingObject = Object.assign({}, this.objectIds[Object.keys(this.objectIds)[0]]);
+            this.voted = this.votingObject.voted;
         },
-        onResolvedIdFromChain() {
-            this.onVotingObjectsUpdate();
-            this._loadDetails();
+        onResolvedVotingProps: function() {
+            let uniqueIdList = null;
+            if (!!this.witnessIds && Object.keys(this.witnessIds).length == 1) {
+                uniqueIdList = this.witnessIds;
+            }
+            if (!!this.workerIds && Object.keys(this.workerIds).length == 1) {
+                if (uniqueIdList != null) {
+                    this.text = "Please do only provide one object type for voting"
+                } else {
+                    uniqueIdList = this.workerIds;
+                }
+            }
+            if (!!this.committeeIds && Object.keys(this.committeeIds).length == 1) {
+                if (uniqueIdList != null) {
+                    this.text = "Please do only provide one object type for voting"
+                } else {
+                    uniqueIdList = this.committeeIds;
+                }
+            }
+            if (uniqueIdList == null) {
+                this.text = "Please provide exactly one object type for voting";
+                this.errored("Initializing failed");
+            }
+            this.votingObject = uniqueIdList[Object.keys(uniqueIdList)[0]];
         },
-        _loadDetails: function () {
+        /**
+        * connection to bitshares via bitsharesjs
+        */
+        onResolvedVotingId: function () {
             // enhance to allow committee and witness
             let worker = this.votingObject.object;
+            this.worker = this.votingObject.object;
 
             let one_day = 1000 * 60 * 60 * 24;
             this.starts_in = Math.round((new Date(worker.work_begin_date + "Z") - new Date()) / one_day);
@@ -94,12 +110,12 @@ export default {
                         loadingDone();
                     }).catch((err) => {
                         // could not load escrow details
-                        console.error(err);
+                        console.log(err);
                         loadingDone();
                     })
                 }).catch((err) => {
                     // could not load escrow details
-                    console.error(err);
+                    console.log(err);
                     loadingDone();
                 })
             } else {
