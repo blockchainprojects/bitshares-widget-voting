@@ -72,6 +72,7 @@
                                     thiz.objectIds[chainObject.id].voteId = chainObject.vote_id;
                                     thiz.objectIds[chainObject.id].object = chainObject;
                                     thiz.objectIds[chainObject.id].text = accounts[0].name;
+                                    thiz.objectIds[chainObject.id].title = accounts[0].name;
                                     thiz.objectIds[chainObject.id].voted = null;
                                     resolve();
                                 });
@@ -85,6 +86,7 @@
                                 thiz.objectIds[chainObject.id].voteId = chainObject.vote_for;
                                 thiz.objectIds[chainObject.id].object = chainObject;
                                 thiz.objectIds[chainObject.id].text = chainObject.name;
+                                thiz.objectIds[chainObject.id].title = chainObject.name;
                                 thiz.objectIds[chainObject.id].voted = null;
                             });
                             resolve();
@@ -98,6 +100,7 @@
                                     thiz.objectIds[chainObject.id].voteId = chainObject.vote_for;
                                     thiz.objectIds[chainObject.id].object = chainObject;
                                     thiz.objectIds[chainObject.id].text = accounts[0].name;
+                                    thiz.objectIds[chainObject.id].title = accounts[0].name;
                                     thiz.objectIds[chainObject.id].voted = null;
                                     resolve();
                                 });
@@ -116,18 +119,26 @@
                 let idsPerType = {};
                 Object.keys(this.objectIds).forEach(key => {
                     let value = this.objectIds[key];
-                    if (!(value.type in idsPerType)) {
-                        idsPerType[value.type] = []
+                    if (!!value.voteId) {
+                        // already resolved
+                    } else {
+                        if (!(value.type in idsPerType)) {
+                            idsPerType[value.type] = []
+                        }
+                        idsPerType[value.type].push(key);
                     }
-                    idsPerType[value.type].push(key);
                 });
                 Object.keys(idsPerType).forEach(key => {
                     let value = idsPerType[key];
                     resolve_all.push(thiz._getOnChainResolvePromise(key, value));
                 });
-                Promise.all(resolve_all).then(() => {
+                if (resolve_all.length == 0) {
                     thiz.onResolvedIdFromChain();
-                });
+                } else {
+                    Promise.all(resolve_all).then(() => {
+                        thiz.onResolvedIdFromChain();
+                    });
+                }
             }
         }
     }

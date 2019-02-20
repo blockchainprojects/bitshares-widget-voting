@@ -14,6 +14,9 @@
             onBeetConnected: function (account) {
                 this._checkIfVoted(account);
             },
+            onResolvedIdFromChain: function () {
+                this.onVotingObjectsUpdate();
+            },
             _checkIfVoted: function(accountId, voteId = null) {
                 return new Promise((resolve, reject) =>
                 {

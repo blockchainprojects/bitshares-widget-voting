@@ -1,11 +1,11 @@
 <template>
     <BitSharesWidgetInlineVoting v-if="layoutfromdiv == 'inline'" :objectid=objectidfromdiv :innerHTML=innerHTML />
-    <!--<BitSharesWidgetVoting v-else :objectid=objectidfromdiv :layout=layoutfromdiv />-->
+    <BitSharesWidgetVoting v-else :objectid=objectidfromdiv :layout=layoutfromdiv />
 </template>
 
 <script>
-
     import BitSharesWidgetInlineVoting from './components/BitSharesWidgetInlineVoting'
+    import BitSharesWidgetVoting from './components/BitSharesWidgetVoting'
 
     export default {
         name: 'bitshares-widget-voting',
@@ -15,7 +15,7 @@
             'innerHTML'
         ],
         components: {
-            //BitSharesWidgetVoting,
+            BitSharesWidgetVoting,
             BitSharesWidgetInlineVoting
         }
     }

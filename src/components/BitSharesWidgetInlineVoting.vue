@@ -31,12 +31,12 @@
 </template>
 
 <script>
-    import AbstractWidgetResolving from './AbstractWidgetResolving'
+    import AbstractWidgetResolvingVoting from './AbstractWidgetResolvingVoting'
     import BCPCopyright from './BCPCopyright'
 
     export default {
         name: 'BitSharesWidgetInlineVoting',
-        extends: AbstractWidgetResolving,
+        extends: AbstractWidgetResolvingVoting,
         components: {
             BCPCopyright
         },
