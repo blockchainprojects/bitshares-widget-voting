@@ -1,5 +1,6 @@
 <template>
-    <BitSharesWidgetInlineVoting v-if="layoutfromdiv == 'inline'" :objectid=objectidfromdiv :innerHTML=innerHTML />
+    <BitSharesWidgetInlineVoting v-if="layoutfromdiv == 'inline'" :objectid=objectidfromdiv :innerHTML=innerHTML :layout=layoutfromdiv />
+    <BitSharesWidgetInlineVoting v-else-if="layoutfromdiv == 'inline-button'" :objectid=objectidfromdiv :innerHTML=innerHTML :layout=layoutfromdiv />
     <BitSharesWidgetVoting v-else :objectid=objectidfromdiv :layout=layoutfromdiv />
 </template>
 

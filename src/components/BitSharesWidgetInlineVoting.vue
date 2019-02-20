@@ -1,6 +1,21 @@
 <template>
     <span class="widget-voting--inline">
-        <div class="widget-voting--inline--text" v-on:click="showPopup">{{ text }}</div>
+        <div class="widget-voting--inline--text" v-on:click="showPopup">
+            {{ text }}
+        </div>
+        <template v-if="layout == 'inline-button'">
+            <div class="widget-voting--inline--voting" v-if="votingObject != null">
+                <div v-if="!!votingObject.failed" class="done">Voting failed</div>
+                <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
+                <template v-else>
+                    <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
+                    <template v-else>
+                        <div class="label">Beet was not found</div>
+                        <button @click="goToBeet()" class="button">Install now</button>
+                    </template>
+                </template>
+            </div>
+        </template>
         <div class="widget-voting--popup" v-show="isPopupVisible">
             <div class="widget-voting--popup--content">
                 <div class="title">
@@ -11,7 +26,7 @@
                         {{ popUpText }}
                     </template>
                 </div>
-                <div class="voting" v-if="votingObject != null">
+                <div class="voting" v-if="votingObject != null && layout == 'inline'">
                     <div v-if="!!votingObject.failed" class="done">Voting failed</div>
                     <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
                     <template v-else>
@@ -36,6 +51,7 @@
 
     export default {
         name: 'BitSharesWidgetInlineVoting',
+        props: ['layout'],
         extends: AbstractWidgetResolvingVoting,
         components: {
             BCPCopyright
@@ -91,11 +107,6 @@
         cursor: pointer;
     }
 
-    .widget-voting--popup--content .voting {
-        float: right;
-        margin-top: 0.5em;
-    }
-
     .widget-voting--popup--content .title {
     }
 
@@ -104,13 +115,34 @@
         margin-top: 2.5em;
     }
 
+    .widget-voting--popup--content .voting {
+        float: right;
+        margin-top: 0.5em;
+    }
+
     .widget-voting--popup--content .voting .label {
         font-size: 0.7em;
         color: gray;
         vertical-align: middle;
     }
 
-    .widget-voting--popup--content .button
+    .widget-voting--popup--content .voting .button
+    {
+        border-radius: 15px;
+    }
+
+    .widget-voting--inline--voting {
+        display: inline;
+        position: relative;
+    }
+
+    .widget-voting--inline--voting .label {
+        font-size: 0.7em;
+        color: gray;
+        vertical-align: middle;
+    }
+
+    .widget-voting--inline--voting .button
     {
         border-radius: 15px;
     }
