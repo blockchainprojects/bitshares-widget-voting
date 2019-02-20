@@ -1,3 +1,88 @@
+.widget-voting--popup {
+    display: inline;
+    position: absolute;
+    min-width: 13em;
+    border-bottom: 6px solid #000;
+    border: thin solid rgba(0, 0, 0, .23);
+    background: #fff;
+    color: #000;
+    border-radius: 16px;
+    padding: 5px 10px 4px;
+    box-shadow: 5px 10px 18px rgba(25, 25, 25, .27);
+    font-size: .9em
+}
+
+.widget-voting--inline {
+    color: #2c3e50;
+    font-family: Avenir, Helvetica, Arial, sans-serif
+}
+
+.widget-voting--inline .widget-voting--popup--content {
+    font-size: .9em
+}
+
+.widget-voting--inline--text {
+    display: inline;
+    position: relative
+}
+
+.widget-voting--inline--text:hover {
+    cursor: pointer
+}
+
+.widget-voting--popup--content .copyright {
+    float: left;
+    margin-top: 2.5em
+}
+
+.widget-voting--popup--content .voting {
+    float: right;
+    margin-top: .5em
+}
+
+.widget-voting--popup--content .voting .label {
+    font-size: .7em;
+    color: gray;
+    vertical-align: middle
+}
+
+.widget-voting--popup--content .voting .button {
+    border-radius: 15px
+}
+
+.widget-voting--inline--voting {
+    display: inline;
+    position: relative
+}
+
+.widget-voting--inline--voting .label {
+    font-size: .7em;
+    color: gray;
+    vertical-align: middle
+}
+
+.widget-voting--inline--voting .button {
+    border-radius: 15px
+}
+
+a {
+    color: #1e7ec8;
+    text-decoration: none
+}
+
+a:hover {
+    text-decoration: underline
+}
+
+.widget--copyright {
+    font-size: .8em
+}
+
+.widget--copyright img {
+    height: 1.6em;
+    width: 1.6em
+}
+
 .widget-voting--tiles {
     text-align: center;
     font-family: Avenir, Helvetica, Arial, sans-serif
@@ -71,74 +156,4 @@
     font-size: .7em;
     color: gray;
     vertical-align: middle
-}
-
-.widget-voting--popup {
-    display: inline;
-    position: absolute;
-    min-width: 13em;
-    border-bottom: 6px solid #000;
-    border: thin solid rgba(0, 0, 0, .23);
-    background: #fff;
-    color: #000;
-    border-radius: 16px;
-    padding: 5px 10px 4px;
-    box-shadow: 5px 10px 18px rgba(25, 25, 25, .27);
-    font-size: .9em
-}
-
-a {
-    color: #1e7ec8;
-    text-decoration: none
-}
-
-a:hover {
-    text-decoration: underline
-}
-
-.widget--copyright {
-    font-size: .8em
-}
-
-.widget--copyright img {
-    height: 1.6em;
-    width: 1.6em
-}
-
-.widget-voting--inline {
-    color: #2c3e50;
-    font-family: Avenir, Helvetica, Arial, sans-serif
-}
-
-.widget-voting--inline .widget-voting--popup--content {
-    font-size: .9em
-}
-
-.widget-voting--inline--text {
-    display: inline;
-    position: relative
-}
-
-.widget-voting--inline--text:hover {
-    cursor: pointer
-}
-
-.widget-voting--popup--content .voting {
-    float: right;
-    margin-top: .5em
-}
-
-.widget-voting--popup--content .copyright {
-    float: left;
-    margin-top: 2.5em
-}
-
-.widget-voting--popup--content .voting .label {
-    font-size: .7em;
-    color: gray;
-    vertical-align: middle
-}
-
-.widget-voting--popup--content .button {
-    border-radius: 15px
 }

@@ -56,6 +56,13 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAYAAABr
 
 /***/ }),
 
+/***/ "BvKm":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
 /***/ "HKDv":
 /***/ (function(module, exports) {
 
@@ -63,7 +70,7 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAbCAYAAABr
 
 /***/ }),
 
-/***/ "KLpq":
+/***/ "J/pj":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
@@ -79,6 +86,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 // EXTERNAL MODULE: ./node_modules/vue/dist/vue.esm.js
 var vue_esm = __webpack_require__("7+uW");
 
+// EXTERNAL MODULE: ./node_modules/babel-runtime/core-js/object/keys.js
+var keys = __webpack_require__("fZjL");
+var keys_default = /*#__PURE__*/__webpack_require__.n(keys);
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/core-js/object/assign.js
+var object_assign = __webpack_require__("woOf");
+var assign_default = /*#__PURE__*/__webpack_require__.n(object_assign);
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/defineProperty.js
+var defineProperty = __webpack_require__("bOdI");
+var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty);
+
 // EXTERNAL MODULE: ./node_modules/babel-runtime/core-js/promise.js
 var promise = __webpack_require__("//Fk");
 var promise_default = /*#__PURE__*/__webpack_require__.n(promise);
@@ -86,17 +105,17 @@ var promise_default = /*#__PURE__*/__webpack_require__.n(promise);
 // EXTERNAL MODULE: ./node_modules/bitsharesjs/es/index.js + 29 modules
 var es = __webpack_require__("0xiO");
 
-// EXTERNAL MODULE: ./node_modules/babel-runtime/core-js/object/keys.js
-var keys = __webpack_require__("fZjL");
-var keys_default = /*#__PURE__*/__webpack_require__.n(keys);
-
-// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/defineProperty.js
-var defineProperty = __webpack_require__("bOdI");
-var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty);
-
 // EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/typeof.js
 var helpers_typeof = __webpack_require__("pFYg");
 var typeof_default = /*#__PURE__*/__webpack_require__.n(helpers_typeof);
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/regenerator/index.js
+var regenerator = __webpack_require__("Xxa5");
+var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
+
+// EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/asyncToGenerator.js
+var asyncToGenerator = __webpack_require__("exGp");
+var asyncToGenerator_default = /*#__PURE__*/__webpack_require__.n(asyncToGenerator);
 
 // EXTERNAL MODULE: ./node_modules/babel-runtime/helpers/classCallCheck.js
 var classCallCheck = __webpack_require__("Zrlr");
@@ -191,6 +210,9 @@ var chain_Blockchain = function () {
                     _this2._connected = true;
                     resolve();
                     _this2._onConnect();
+                }).catch(function (err) {
+                    reject(err);
+                    _this2._onError();
                 });
             }).catch(function (err) {
                 idx = idx + 1;
@@ -228,10 +250,6 @@ var beet_Beet = function () {
         classCallCheck_default()(this, Beet);
 
         this._beet = beet;
-
-        this._connected = false;
-        this._connectingInProgress = false;
-
         this._buffer = {};
     }
 
@@ -255,22 +273,20 @@ var beet_Beet = function () {
         value: function connect() {
             var _this = this;
 
-            var _connect = function _connect() {
-                var thiz = _this;
-                return new promise_default.a(function (resolve, reject) {
-                    thiz._beet.initAndConnect("BitShares Voting Widget", "BTS").then(function (res) {
-                        res.beet = thiz._beet;
-                        resolve(res);
-                    }).catch(reject);
-                });
-            };
-
             if (!this._buffer.connect) {
+                var _connect = function _connect() {
+                    var thiz = _this;
+                    return new promise_default.a(function (resolve, reject) {
+                        thiz._beet.initAndConnect("BitShares Voting Widget", "BTS").then(function (res) {
+                            res.beet = thiz._beet;
+                            resolve(res);
+                        }).catch(reject);
+                    });
+                };
                 var _tmp = new beet_BufferedExecution(_connect.bind(this));
                 this._buffer.connect = _tmp;
             }
-            var buffer = this._buffer.connect;
-            return buffer.execute();
+            return this._buffer.connect.execute();
         }
     }]);
 
@@ -287,6 +303,8 @@ var beet_BufferedExecution = function () {
         this._rejects = [];
 
         this._actualCall = actualCall;
+
+        this._result = null;
     }
 
     createClass_default()(BufferedExecution, [{
@@ -300,16 +318,27 @@ var beet_BufferedExecution = function () {
                     _this2._rejects.push(reject);
                 });
             } else {
-                return new promise_default.a(function (resolve, reject) {
-                    _this2._resolves.push(resolve);
-                    _this2._rejects.push(reject);
-                    _this2._actuallyExecute();
-                });
+                this._executionInProgress = true;
+                if (this._result != null) {
+                    return new promise_default.a(function (resolve, reject) {
+                        _this2._resolves.push(resolve);
+                        _this2._rejects.push(reject);
+                        _this2._onResolve(_this2._result);
+                    });
+                } else {
+                    return new promise_default.a(function (resolve, reject) {
+                        _this2._resolves.push(resolve);
+                        _this2._rejects.push(reject);
+                        _this2._actuallyExecute();
+                    });
+                }
             }
         }
     }, {
         key: "_onResolve",
         value: function _onResolve(argument) {
+            this._executionInProgress = false;
+            this._result = argument;
             this._resolves.forEach(function (resolve) {
                 resolve(argument);
             });
@@ -318,6 +347,7 @@ var beet_BufferedExecution = function () {
     }, {
         key: "_onError",
         value: function _onError(err) {
+            this._executionInProgress = false;
             this._rejects.forEach(function (reject) {
                 reject(err);
             });
@@ -335,7 +365,9 @@ var beet_BufferedExecution = function () {
 
 var beeet = new beet_Beet();
 /* harmony default export */ var src_beet = (beeet);
-// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/AbstractBitSharesWidget.vue
+// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/AbstractWidget.vue
+
+
 //
 //
 //
@@ -344,9 +376,8 @@ var beeet = new beet_Beet();
 
 
 
-
-/* harmony default export */ var AbstractBitSharesWidget = ({
-    name: 'AbstractBitSharesWidget',
+/* harmony default export */ var AbstractWidget = ({
+    name: 'AbstractWidget',
     props: [],
     data: function data() {
         return {
@@ -354,13 +385,11 @@ var beeet = new beet_Beet();
             stateName: "Initializing",
 
             // if any error occured
-            errorName: null,
+            error: null,
 
             // installation status
             beetFound: null,
             chainConnected: null,
-
-            // chain connectivity
 
             // access to beet
             beet: src_beet,
@@ -369,17 +398,20 @@ var beeet = new beet_Beet();
             chain: src_chain,
 
             ChainStore: es["a" /* ChainStore */],
-            FetchChainObjects: es["c" /* FetchChainObjects */]
+            FetchChainObjects: es["c" /* FetchChainObjects */],
+
+            connectOnCreate: true,
+            checkBeetOnCreate: true
         };
     },
 
     created: function created() {
-        var _this = this;
-
-        setTimeout(function () {
-            _this.stateName = "ConnectingToChain";
-            _this._connectToChainAndStart();
-        }, 1);
+        if (this.connectOnCreate) {
+            this._connectToChainAndStart();
+        }
+        if (this.checkBeetOnCreate) {
+            this._checkBeetInstallation();
+        }
     },
     methods: {
         goToBeet: function goToBeet() {
@@ -390,26 +422,26 @@ var beeet = new beet_Beet();
         errored: function errored(error) {
             var message = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
 
-            console.log(error);
+            console.error(error);
             this.stateName = "Errored";
-            this.errorName = error;
+            this.error = error;
         },
         _checkBeetInstallation: function _checkBeetInstallation() {
-            var _this2 = this;
+            var _this = this;
 
             this.beetFound = false;
 
             this.beet.isInstalled().then(function (status) {
-                _this2.beetFound = status;
-                _this2.onBeetFound(status);
-                _this2.stateName = "Done";
+                _this.beetFound = status;
+                _this.onBeetFound(status);
+                _this.stateName = "Done";
             }).catch(function (err) {
-                _this2.errored(err);
-                _this2.beetFound = false;
-                _this2.onBeetFound(false);
+                _this.errored(err);
+                _this.beetFound = false;
+                _this.onBeetFound(false);
                 setTimeout(function () {
                     console.log("retrying to find beet");
-                    _this2._checkBeetInstallation();
+                    _this._checkBeetInstallation();
                 }, 5000);
             });
         },
@@ -418,42 +450,82 @@ var beeet = new beet_Beet();
             this.onBeetFound(status);
             this.stateName = "WaitingForBeet";
         },
+        _fetch: function _fetch(args) {
+            FetchChain: es["b" /* FetchChain */];
+        },
+
         /**
          * connection to bitshares via bitsharesjs
          */
-        _connectToChainAndStart: function _connectToChainAndStart() {
-            var _this3 = this;
+        _connectToChainAndStart: function () {
+            var _ref = asyncToGenerator_default()( /*#__PURE__*/regenerator_default.a.mark(function _callee() {
+                return regenerator_default.a.wrap(function _callee$(_context) {
+                    while (1) {
+                        switch (_context.prev = _context.next) {
+                            case 0:
+                                this.stateName = "ConnectingToChain";
+                                _context.prev = 1;
+                                _context.next = 4;
+                                return this.chain.connect();
 
-            // connection and then the ChainStore is initialized
-            this.chain.connect().then(function () {
-                _this3.chainConnected = true;
-                _this3.onConnected();
+                            case 4:
+                                this.chainConnected = true;
+                                this.onConnected();
+                                this.stateName = "CheckingBeetInstallation";
 
-                _this3.stateName = "CheckingBeetInstallation";
-                _this3._checkBeetInstallation();
-            }).catch(function (err) {
-                _this3.errored(err);
-                console.log("Connection attempt failed", err);
-                _this3.chainConnected = false;
-            });
-        },
+                            case 7:
+                                _context.prev = 7;
+
+                                //this.errored("Connection attempt failed: " + err);
+                                this.chainConnected = false;
+                                return _context.finish(7);
+
+                            case 10:
+                            case 'end':
+                                return _context.stop();
+                        }
+                    }
+                }, _callee, this, [[1,, 7, 10]]);
+            }));
+
+            function _connectToChainAndStart() {
+                return _ref.apply(this, arguments);
+            }
+
+            return _connectToChainAndStart;
+        }(),
         onBeetFound: function onBeetFound(status) {
-            // may be overwritten
+            var _this2 = this;
+
+            if (status) {
+                // check voting status
+                var thiz = this;
+                this.beet.connect().then(function (connected) {
+                    if (connected) {
+                        thiz.onBeetConnected(connected.account_id);
+                    } else {
+                        _this2.errored("Connection to Beet could not be established");
+                        _this2.setBeetInstallationStatus(false);
+                    }
+                });
+            }
         },
         onConnected: function onConnected(status) {
             // may be overwritten
+        },
+        onBeetConnected: function onBeetConnected(account) {
+            // may be overwritten
         }
-
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-3daefb22","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidget.vue
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-096bf469","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractWidget.vue
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c("div")}
 var staticRenderFns = []
 var esExports = { render: render, staticRenderFns: staticRenderFns }
-/* harmony default export */ var components_AbstractBitSharesWidget = (esExports);
-// CONCATENATED MODULE: ./src/components/AbstractBitSharesWidget.vue
+/* harmony default export */ var components_AbstractWidget = (esExports);
+// CONCATENATED MODULE: ./src/components/AbstractWidget.vue
 function injectStyle (ssrContext) {
-  __webpack_require__("um4m")
+  __webpack_require__("cCJr")
 }
 var normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -470,18 +542,17 @@ var __vue_scopeId__ = null
 /* moduleIdentifier (server only) */
 var __vue_module_identifier__ = null
 var Component = normalizeComponent(
-  AbstractBitSharesWidget,
-  components_AbstractBitSharesWidget,
+  AbstractWidget,
+  components_AbstractWidget,
   __vue_template_functional__,
   __vue_styles__,
   __vue_scopeId__,
   __vue_module_identifier__
 )
 
-/* harmony default export */ var src_components_AbstractBitSharesWidget = (Component.exports);
+/* harmony default export */ var src_components_AbstractWidget = (Component.exports);
 
-// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/AbstractBitSharesWidgetVoting.vue
-
+// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/AbstractWidgetResolving.vue
 
 
 
@@ -492,178 +563,216 @@ var Component = normalizeComponent(
 
 
 
-/* harmony default export */ var AbstractBitSharesWidgetVoting = ({
-    name: 'AbstractBitSharesWidgetVoting',
-    props: ['workerid', 'witnessid', 'committeeid', 'innerHTML'],
-    extends: src_components_AbstractBitSharesWidget,
+/* harmony default export */ var AbstractWidgetResolving = ({
+    name: 'AbstractWidgetResolving',
+    props: ['objectid'],
+    extends: src_components_AbstractWidget,
     components: {},
     data: function data() {
         return {
-            workerIds: null,
-            witnessIds: null,
-            committeeIds: null,
+            objectIds: null,
 
-            isPopupVisible: false,
-            resolveIds: true
+            resolveIdsFromPropsOnCreate: true,
+            resolveIdsFromChainOnConnected: true
         };
     },
 
-    beforeMount: function beforeMount() {
-        this._resolveIdsFromProps();
-    },
     methods: {
         onConnected: function onConnected() {
-            if (this.resolveIds) {
+            if (this.resolveIdsFromChainOnConnected) {
+                this._resolveIdsFromProps();
                 this._resolveIdsOnChain();
             }
         },
-        onResolvedVotingId: function onResolvedVotingId() {
+        onResolvedIdFromChain: function onResolvedIdFromChain() {
             // overwrite
         },
-        onResolvedVotingProps: function onResolvedVotingProps() {
+        onResolvedIdFromProps: function onResolvedIdFromProps() {
             // overwrite
         },
         onVotingObjectsUpdate: function onVotingObjectsUpdate() {
             // overwrite
         },
-        showPopup: function showPopup() {
-            this.isPopupVisible = !this.isPopupVisible;
-        },
         _resolveIdsFromProps: function _resolveIdsFromProps() {
             var _this = this;
 
-            if (typeof this.witnessid === 'string' && this.witnessid !== "") {
-                this.witnessIds = {};
-                this.witnessid.split(";").forEach(function (item) {
-                    _this.witnessIds[item] = {
+            if (typeof this.objectid === 'string' && this.objectid !== "") {
+                this.objectIds = {};
+
+                this.objectid.split(";").forEach(function (item) {
+                    _this.objectIds[item] = {
                         "id": item,
-                        "type": "Witness"
+                        "type": item.split(".")[1]
                     };
                 });
-            } else if (typeof_default()(this.witnessid) === 'object') {
+            } else if (typeof_default()(this.objectid) === 'object') {
                 // already resolved
 
                 // convert to dict that has the ids as struct
-                if ("id" in this.witnessid) {
-                    this.witnessIds = {};
-                    this.witnessIds[this.witnessid.id] = this.witnessid;
+                if ("id" in this.objectid) {
+                    this.objectIds = {};
+                    this.objectIds[this.objectid.id] = this.objectid;
                 } else {
-                    this.witnessIds = this.witnessid;
+                    this.objectIds = this.objectid;
                 }
+            } else {
+                throw "Widget needs objectid props";
             }
-            if (typeof this.workerid === 'string' && this.workerid !== "") {
-                this.workerIds = {};
-                this.workerid.split(";").forEach(function (item) {
-                    _this.workerIds[item] = {
-                        "id": item,
-                        "type": "Worker"
-                    };
-                });
-            } else if (typeof_default()(this.workerid) === 'object') {
-                // already resolved
-
-                // convert to dict that has the ids as struct
-                if ("id" in this.workerid) {
-                    this.workerIds = {};
-                    this.workerIds[this.workerid.id] = this.workerid;
-                } else {
-                    this.workerIds = this.workerid;
-                }
-            }
-            if (typeof this.committeeid === 'string' && this.committeeid !== "") {
-                this.committeeIds = {};
-                this.committeeid.split(";").forEach(function (item) {
-                    _this.committeeIds[item] = {
-                        "id": item,
-                        "type": "Committee"
-                    };
-                });
-            } else if (typeof_default()(this.committeeid) === 'object') {
-                // already resolved
-
-                // convert to dict that has the ids as struct
-                if ("id" in this.committeeid) {
-                    this.committeeIds = {};
-                    this.committeeIds[this.committeeid.id] = this.committeeid;
-                } else {
-                    this.committeeIds = this.committeeid;
-                }
-            }
-            this.onResolvedVotingProps();
+            this.onResolvedIdFromProps();
         },
-        _resolveIdsOnChain: function _resolveIdsOnChain() {
+        _getOnChainResolvePromise: function _getOnChainResolvePromise(type, ids) {
             var _this2 = this;
 
-            if (!!this.witnessIds && keys_default()(this.witnessIds).length > 0) {
-                this.chain.db_exec('get_objects', [keys_default()(this.witnessIds)]).then(function (chainObjects) {
-                    chainObjects.forEach(function (chainObject) {
-                        _this2.chain.db_exec('get_objects', [[chainObject.witness_account]]).then(function (accounts) {
-                            _this2.witnessIds[chainObject.id].voteId = chainObject.vote_id;
-                            _this2.witnessIds[chainObject.id].object = chainObject;
-                            _this2.witnessIds[chainObject.id].text = accounts[0].name;
-                            _this2.witnessIds[chainObject.id].voted = null;
-                            console.log("votable chain object found", _this2.witnessIds[chainObject.id]);
-                            _this2.onResolvedVotingId();
+            var thiz = this;
+            if (type == "6") {
+                // witness
+                return new promise_default.a(function (resolve) {
+                    thiz.chain.db_exec('get_objects', [ids]).then(function (chainObjects) {
+                        var all_promises = [];
+                        chainObjects.forEach(function (chainObject) {
+                            thiz.chain.db_exec('get_objects', [[chainObject.witness_account]]).then(function (accounts) {
+                                thiz.objectIds[chainObject.id].voteId = chainObject.vote_id;
+                                thiz.objectIds[chainObject.id].object = chainObject;
+                                thiz.objectIds[chainObject.id].text = accounts[0].name;
+                                thiz.objectIds[chainObject.id].title = accounts[0].name;
+                                thiz.objectIds[chainObject.id].voted = null;
+                                resolve();
+                            });
                         });
                     });
                 });
-            }
-            if (!!this.workerIds && keys_default()(this.workerIds).length > 0) {
-                this.chain.db_exec('get_objects', [keys_default()(this.workerIds)]).then(function (chainObjects) {
-                    chainObjects.forEach(function (chainObject) {
-                        _this2.workerIds[chainObject.id].voteId = chainObject.vote_for;
-                        _this2.workerIds[chainObject.id].object = chainObject;
-                        _this2.workerIds[chainObject.id].text = chainObject.name;
-                        _this2.workerIds[chainObject.id].voted = null;
-                        console.log("votable chain object found", _this2.workerIds[chainObject.id]);
+            } else if (type == "14") {
+                return new promise_default.a(function (resolve) {
+                    _this2.chain.db_exec('get_objects', [ids]).then(function (chainObjects) {
+                        chainObjects.forEach(function (chainObject) {
+                            thiz.objectIds[chainObject.id].voteId = chainObject.vote_for;
+                            thiz.objectIds[chainObject.id].object = chainObject;
+                            thiz.objectIds[chainObject.id].text = chainObject.name;
+                            thiz.objectIds[chainObject.id].title = chainObject.name;
+                            thiz.objectIds[chainObject.id].voted = null;
+                        });
+                        resolve();
                     });
-                    _this2.onResolvedVotingId();
                 });
-            }
-            if (!!this.committeeIds && keys_default()(this.committeeIds).length > 0) {
-                this.chain.db_exec('get_objects', [keys_default()(this.committeeIds)]).then(function (chainObjects) {
-                    chainObjects.forEach(function (chainObject) {
-                        _this2.chain.db_exec('get_objects', [[chainObject.committee_account]]).then(function (accounts) {
-                            _this2.committeeIds[chainObject.id].voteId = chainObject.vote_for;
-                            _this2.committeeIds[chainObject.id].object = chainObject;
-                            _this2.committeeIds[chainObject.id].text = accounts[0].name;
-                            _this2.committeeIds[chainObject.id].voted = null;
-                            console.log("votable chain object found", _this2.committeeIds[chainObjects.id]);
-                            _this2.onResolvedVotingId();
+            } else if (type == "14") {
+                return new promise_default.a(function (resolve) {
+                    _this2.chain.db_exec('get_objects', [ids]).then(function (chainObjects) {
+                        chainObjects.forEach(function (chainObject) {
+                            thiz.chain.db_exec('get_objects', [[chainObject.committee_account]]).then(function (accounts) {
+                                thiz.objectIds[chainObject.id].voteId = chainObject.vote_for;
+                                thiz.objectIds[chainObject.id].object = chainObject;
+                                thiz.objectIds[chainObject.id].text = accounts[0].name;
+                                thiz.objectIds[chainObject.id].title = accounts[0].name;
+                                thiz.objectIds[chainObject.id].voted = null;
+                                resolve();
+                            });
                         });
                     });
                 });
+            } else {
+                throw "Unsupported object id";
             }
         },
-        onBeetFound: function onBeetFound(status) {
+
+        _resolveIdsOnChain: function _resolveIdsOnChain() {
             var _this3 = this;
 
-            if (status) {
-                // check voting status
-                var thiz = this;
-                this.beet.connect().then(function (connected) {
-                    if (connected) {
-                        thiz._checkIfVoted(connected.account_id);
-                    } else {
-                        _this3.errored("Connection to Beet could not be established");
-                        _this3.setBeetInstallationStatus(false);
+            var resolve_all = [];
+            var thiz = this;
+
+            // sort same types together
+            var idsPerType = {};
+            keys_default()(this.objectIds).forEach(function (key) {
+                var value = _this3.objectIds[key];
+                if (!!value.voteId) {
+                    // already resolved
+                } else {
+                    if (!(value.type in idsPerType)) {
+                        idsPerType[value.type] = [];
                     }
+                    idsPerType[value.type].push(key);
+                }
+            });
+            keys_default()(idsPerType).forEach(function (key) {
+                var value = idsPerType[key];
+                resolve_all.push(thiz._getOnChainResolvePromise(key, value));
+            });
+            if (resolve_all.length == 0) {
+                thiz.onResolvedIdFromChain();
+            } else {
+                promise_default.a.all(resolve_all).then(function () {
+                    thiz.onResolvedIdFromChain();
                 });
             }
+        }
+    }
+});
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-2920daf9","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractWidgetResolving.vue
+var AbstractWidgetResolving_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c("div")}
+var AbstractWidgetResolving_staticRenderFns = []
+var AbstractWidgetResolving_esExports = { render: AbstractWidgetResolving_render, staticRenderFns: AbstractWidgetResolving_staticRenderFns }
+/* harmony default export */ var components_AbstractWidgetResolving = (AbstractWidgetResolving_esExports);
+// CONCATENATED MODULE: ./src/components/AbstractWidgetResolving.vue
+function AbstractWidgetResolving_injectStyle (ssrContext) {
+  __webpack_require__("g1sd")
+}
+var AbstractWidgetResolving_normalizeComponent = __webpack_require__("VU/8")
+/* script */
+
+
+/* template */
+
+/* template functional */
+var AbstractWidgetResolving___vue_template_functional__ = false
+/* styles */
+var AbstractWidgetResolving___vue_styles__ = AbstractWidgetResolving_injectStyle
+/* scopeId */
+var AbstractWidgetResolving___vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var AbstractWidgetResolving___vue_module_identifier__ = null
+var AbstractWidgetResolving_Component = AbstractWidgetResolving_normalizeComponent(
+  AbstractWidgetResolving,
+  components_AbstractWidgetResolving,
+  AbstractWidgetResolving___vue_template_functional__,
+  AbstractWidgetResolving___vue_styles__,
+  AbstractWidgetResolving___vue_scopeId__,
+  AbstractWidgetResolving___vue_module_identifier__
+)
+
+/* harmony default export */ var src_components_AbstractWidgetResolving = (AbstractWidgetResolving_Component.exports);
+
+// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/AbstractWidgetResolvingVoting.vue
+
+
+//
+//
+//
+
+
+
+
+/* harmony default export */ var AbstractWidgetResolvingVoting = ({
+    name: 'AbstractWidgetResolvingVoting',
+    extends: src_components_AbstractWidgetResolving,
+    components: {},
+    methods: {
+        onBeetConnected: function onBeetConnected(account) {
+            this._checkIfVoted(account);
+        },
+        onResolvedIdFromChain: function onResolvedIdFromChain() {
+            this.onVotingObjectsUpdate();
         },
         _checkIfVoted: function _checkIfVoted(accountId) {
-            var _this4 = this;
+            var _this = this;
 
             var voteId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
             return new promise_default.a(function (resolve, reject) {
-                var thiz = _this4;
+                var thiz = _this;
                 Object(es["b" /* FetchChain */])("getAccount", accountId, undefined, defineProperty_default()({}, accountId, true)).then(function (account) {
                     account = account.toJS();
                     if (voteId == null) {
-                        thiz._checkIfVotedObjects(account, thiz.witnessIds);
-                        thiz._checkIfVotedObjects(account, thiz.workerIds);
-                        thiz._checkIfVotedObjects(account, thiz.committeeIds);
+                        thiz._checkIfVotedObjects(account, thiz.objectIds);
                         resolve();
                     } else {
                         var voted = !(account.options.votes.indexOf(voteId) == -1);
@@ -682,11 +791,11 @@ var Component = normalizeComponent(
                 } else {
                     objectIds[key].voted = true;
                 }
-                this.onVotingObjectsUpdate();
             }
+            this.onVotingObjectsUpdate();
         },
         vote: function vote(votingObject) {
-            var _this5 = this;
+            var _this2 = this;
 
             var thiz = this;
 
@@ -698,7 +807,7 @@ var Component = normalizeComponent(
                                 id: thiz.votingObject.id
                             }).then(function (result) {
                                 votingObject.voted = true;
-                                _this5.onVotingObjectsUpdate();
+                                _this2.onVotingObjectsUpdate();
                             }).catch(function (err) {
                                 votingObject.failed = true;
                                 thiz.errored(err);
@@ -708,50 +817,181 @@ var Component = normalizeComponent(
                         thiz.errored(err);
                     });
                 } else {
-                    _this5.errored("Connection to Beet could not be established");
-                    _this5.setBeetInstallationStatus(false);
+                    _this2.errored("Connection to Beet could not be established");
+                    _this2.setBeetInstallationStatus(false);
                 }
             }).catch(function (err) {
-                _this5.errored(err);
+                _this2.errored(err);
             });
+        },
+        onVotingObjectsUpdate: function onVotingObjectsUpdate() {
+            // may be overriden
         }
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-4c599ff2","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractBitSharesWidgetVoting.vue
-var AbstractBitSharesWidgetVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c("div")}
-var AbstractBitSharesWidgetVoting_staticRenderFns = []
-var AbstractBitSharesWidgetVoting_esExports = { render: AbstractBitSharesWidgetVoting_render, staticRenderFns: AbstractBitSharesWidgetVoting_staticRenderFns }
-/* harmony default export */ var components_AbstractBitSharesWidgetVoting = (AbstractBitSharesWidgetVoting_esExports);
-// CONCATENATED MODULE: ./src/components/AbstractBitSharesWidgetVoting.vue
-function AbstractBitSharesWidgetVoting_injectStyle (ssrContext) {
-  __webpack_require__("KLpq")
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-3f4ddd51","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/AbstractWidgetResolvingVoting.vue
+var AbstractWidgetResolvingVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c("div")}
+var AbstractWidgetResolvingVoting_staticRenderFns = []
+var AbstractWidgetResolvingVoting_esExports = { render: AbstractWidgetResolvingVoting_render, staticRenderFns: AbstractWidgetResolvingVoting_staticRenderFns }
+/* harmony default export */ var components_AbstractWidgetResolvingVoting = (AbstractWidgetResolvingVoting_esExports);
+// CONCATENATED MODULE: ./src/components/AbstractWidgetResolvingVoting.vue
+function AbstractWidgetResolvingVoting_injectStyle (ssrContext) {
+  __webpack_require__("Qv8u")
 }
-var AbstractBitSharesWidgetVoting_normalizeComponent = __webpack_require__("VU/8")
+var AbstractWidgetResolvingVoting_normalizeComponent = __webpack_require__("VU/8")
 /* script */
 
 
 /* template */
 
 /* template functional */
-var AbstractBitSharesWidgetVoting___vue_template_functional__ = false
+var AbstractWidgetResolvingVoting___vue_template_functional__ = false
 /* styles */
-var AbstractBitSharesWidgetVoting___vue_styles__ = AbstractBitSharesWidgetVoting_injectStyle
+var AbstractWidgetResolvingVoting___vue_styles__ = AbstractWidgetResolvingVoting_injectStyle
 /* scopeId */
-var AbstractBitSharesWidgetVoting___vue_scopeId__ = null
+var AbstractWidgetResolvingVoting___vue_scopeId__ = null
 /* moduleIdentifier (server only) */
-var AbstractBitSharesWidgetVoting___vue_module_identifier__ = null
-var AbstractBitSharesWidgetVoting_Component = AbstractBitSharesWidgetVoting_normalizeComponent(
-  AbstractBitSharesWidgetVoting,
-  components_AbstractBitSharesWidgetVoting,
-  AbstractBitSharesWidgetVoting___vue_template_functional__,
-  AbstractBitSharesWidgetVoting___vue_styles__,
-  AbstractBitSharesWidgetVoting___vue_scopeId__,
-  AbstractBitSharesWidgetVoting___vue_module_identifier__
+var AbstractWidgetResolvingVoting___vue_module_identifier__ = null
+var AbstractWidgetResolvingVoting_Component = AbstractWidgetResolvingVoting_normalizeComponent(
+  AbstractWidgetResolvingVoting,
+  components_AbstractWidgetResolvingVoting,
+  AbstractWidgetResolvingVoting___vue_template_functional__,
+  AbstractWidgetResolvingVoting___vue_styles__,
+  AbstractWidgetResolvingVoting___vue_scopeId__,
+  AbstractWidgetResolvingVoting___vue_module_identifier__
 )
 
-/* harmony default export */ var src_components_AbstractBitSharesWidgetVoting = (AbstractBitSharesWidgetVoting_Component.exports);
+/* harmony default export */ var src_components_AbstractWidgetResolvingVoting = (AbstractWidgetResolvingVoting_Component.exports);
+
+// EXTERNAL MODULE: ./src/components/BCPCopyright.vue
+var BCPCopyright = __webpack_require__("lVzp");
+
+// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/BitSharesWidgetInlineVoting.vue
+
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+
+/* harmony default export */ var BitSharesWidgetInlineVoting = ({
+    name: 'BitSharesWidgetInlineVoting',
+    props: ['layout'],
+    extends: src_components_AbstractWidgetResolvingVoting,
+    components: {
+        BCPCopyright: BCPCopyright["default"]
+    },
+    data: function data() {
+        return {
+            text: this.innerHTML, // initialize with given text
+            popUpText: "Loading ...",
+            isPopupVisible: false,
+            votingObject: null
+        };
+    },
+
+    methods: {
+        showPopup: function showPopup() {
+            this.isPopupVisible = !this.isPopupVisible;
+        },
+        showVotingObject: function showVotingObject() {
+            this.votingObject = assign_default()({}, this.objectIds[keys_default()(this.objectIds)[0]]);
+            this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
+            if (!!this.votingObject.text) {
+                this.text = this.votingObject.text;
+            }
+        },
+
+        onResolvedIdFromChain: function onResolvedIdFromChain() {
+            this.showVotingObject();
+        },
+        onVotingObjectsUpdate: function onVotingObjectsUpdate() {
+            this.showVotingObject();
+        }
+    }
+});
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-77a0bb18","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetInlineVoting.vue
+var BitSharesWidgetInlineVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('span',{staticClass:"widget-voting--inline"},[_c('div',{staticClass:"widget-voting--inline--text",on:{"click":_vm.showPopup}},[_vm._v("\n        "+_vm._s(_vm.text)+"\n    ")]),_vm._v(" "),(_vm.layout == 'inline-button')?[(_vm.votingObject != null)?_c('div',{staticClass:"widget-voting--inline--voting"},[(!!_vm.votingObject.failed)?_c('div',{staticClass:"done"},[_vm._v("Voting failed")]):_vm._e(),_vm._v(" "),(_vm.votingObject.voted)?_c('div',{staticClass:"done"},[_vm._v("Voted ✔")]):[(_vm.beetFound)?_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")]):[_c('div',{staticClass:"label"},[_vm._v("Beet was not found")]),_vm._v(" "),_c('button',{staticClass:"button",on:{"click":function($event){_vm.goToBeet()}}},[_vm._v("Install now")])]]],2):_vm._e()]:_vm._e(),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isPopupVisible),expression:"isPopupVisible"}],staticClass:"widget-voting--popup"},[_c('div',{staticClass:"widget-voting--popup--content"},[_c('div',{staticClass:"title"},[(_vm.votingObject != null && _vm.votingObject.object != null)?_c('a',{attrs:{"href":'http://bitshares-explorer.io/#/objects/' + _vm.votingObject.object.id,"target":"_blank"}},[_vm._v("\n                    "+_vm._s(_vm.popUpText)+"\n                ")]):[_vm._v("\n                    "+_vm._s(_vm.popUpText)+"\n                ")]],2),_vm._v(" "),(_vm.votingObject != null && _vm.layout == 'inline')?_c('div',{staticClass:"voting"},[(!!_vm.votingObject.failed)?_c('div',{staticClass:"done"},[_vm._v("Voting failed")]):_vm._e(),_vm._v(" "),(_vm.votingObject.voted)?_c('div',{staticClass:"done"},[_vm._v("Voted ✔")]):[(_vm.beetFound)?_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")]):[_c('div',{staticClass:"label"},[_vm._v("Beet was not found")]),_vm._v(" "),_c('button',{staticClass:"button",on:{"click":function($event){_vm.goToBeet()}}},[_vm._v("Install now")])]]],2):_vm._e(),_vm._v(" "),_c('div',{staticClass:"copyright"},[_c('BCPCopyright')],1)])])],2)}
+var BitSharesWidgetInlineVoting_staticRenderFns = []
+var BitSharesWidgetInlineVoting_esExports = { render: BitSharesWidgetInlineVoting_render, staticRenderFns: BitSharesWidgetInlineVoting_staticRenderFns }
+/* harmony default export */ var components_BitSharesWidgetInlineVoting = (BitSharesWidgetInlineVoting_esExports);
+// CONCATENATED MODULE: ./src/components/BitSharesWidgetInlineVoting.vue
+function BitSharesWidgetInlineVoting_injectStyle (ssrContext) {
+  __webpack_require__("Y5F/")
+}
+var BitSharesWidgetInlineVoting_normalizeComponent = __webpack_require__("VU/8")
+/* script */
+
+
+/* template */
+
+/* template functional */
+var BitSharesWidgetInlineVoting___vue_template_functional__ = false
+/* styles */
+var BitSharesWidgetInlineVoting___vue_styles__ = BitSharesWidgetInlineVoting_injectStyle
+/* scopeId */
+var BitSharesWidgetInlineVoting___vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var BitSharesWidgetInlineVoting___vue_module_identifier__ = null
+var BitSharesWidgetInlineVoting_Component = BitSharesWidgetInlineVoting_normalizeComponent(
+  BitSharesWidgetInlineVoting,
+  components_BitSharesWidgetInlineVoting,
+  BitSharesWidgetInlineVoting___vue_template_functional__,
+  BitSharesWidgetInlineVoting___vue_styles__,
+  BitSharesWidgetInlineVoting___vue_scopeId__,
+  BitSharesWidgetInlineVoting___vue_module_identifier__
+)
+
+/* harmony default export */ var src_components_BitSharesWidgetInlineVoting = (BitSharesWidgetInlineVoting_Component.exports);
 
 // CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/BitSharesWorker.vue
+
 
 //
 //
@@ -798,7 +1038,7 @@ var AbstractBitSharesWidgetVoting_Component = AbstractBitSharesWidgetVoting_norm
 
 /* harmony default export */ var BitSharesWorker = ({
     name: 'BitSharesWorker',
-    extends: src_components_AbstractBitSharesWidgetVoting,
+    extends: src_components_AbstractWidgetResolvingVoting,
     data: function data() {
         return {
             starts_in: null,
@@ -809,7 +1049,7 @@ var AbstractBitSharesWidgetVoting_Component = AbstractBitSharesWidgetVoting_norm
 
             loading: true,
 
-            voted: false,
+            votingObject: null,
 
             FetchChain: es["b" /* FetchChain */]
         };
@@ -817,41 +1057,16 @@ var AbstractBitSharesWidgetVoting_Component = AbstractBitSharesWidgetVoting_norm
 
     methods: {
         onVotingObjectsUpdate: function onVotingObjectsUpdate() {
-            this.voted = this.votingObject.voted;
+            this.votingObject = assign_default()({}, this.objectIds[keys_default()(this.objectIds)[0]]);
+        },
+        onResolvedIdFromChain: function onResolvedIdFromChain() {
+            this.onVotingObjectsUpdate();
+            this._loadDetails();
         },
 
-        onResolvedVotingProps: function onResolvedVotingProps() {
-            var uniqueIdList = null;
-            if (!!this.witnessIds && keys_default()(this.witnessIds).length == 1) {
-                uniqueIdList = this.witnessIds;
-            }
-            if (!!this.workerIds && keys_default()(this.workerIds).length == 1) {
-                if (uniqueIdList != null) {
-                    this.text = "Please do only provide one object type for voting";
-                } else {
-                    uniqueIdList = this.workerIds;
-                }
-            }
-            if (!!this.committeeIds && keys_default()(this.committeeIds).length == 1) {
-                if (uniqueIdList != null) {
-                    this.text = "Please do only provide one object type for voting";
-                } else {
-                    uniqueIdList = this.committeeIds;
-                }
-            }
-            if (uniqueIdList == null) {
-                this.text = "Please provide exactly one object type for voting";
-                this.errored("Initializing failed");
-            }
-            this.votingObject = uniqueIdList[keys_default()(uniqueIdList)[0]];
-        },
-        /**
-        * connection to bitshares via bitsharesjs
-        */
-        onResolvedVotingId: function onResolvedVotingId() {
+        _loadDetails: function _loadDetails() {
             // enhance to allow committee and witness
             var worker = this.votingObject.object;
-            this.worker = this.votingObject.object;
 
             var one_day = 1000 * 60 * 60 * 24;
             this.starts_in = Math.round((new Date(worker.work_begin_date + "Z") - new Date()) / one_day);
@@ -876,12 +1091,12 @@ var AbstractBitSharesWidgetVoting_Component = AbstractBitSharesWidgetVoting_norm
                         loadingDone();
                     }).catch(function (err) {
                         // could not load escrow details
-                        console.log(err);
+                        console.error(err);
                         loadingDone();
                     });
                 }).catch(function (err) {
                     // could not load escrow details
-                    console.log(err);
+                    console.error(err);
                     loadingDone();
                 });
             } else {
@@ -893,14 +1108,14 @@ var AbstractBitSharesWidgetVoting_Component = AbstractBitSharesWidgetVoting_norm
         }
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-5ca972ec","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWorker.vue
-var BitSharesWorker_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (!_vm.loading)?_c('div',{staticClass:"worker"},[_c('h3',[_vm._v("Worker: "+_vm._s(_vm.worker.id)+" - "+_vm._s(_vm.worker.name))]),_vm._v(" "),(_vm.receives)?_c('div',{staticClass:"status"},[(_vm.receives.daily.float > 0)?_c('div',[_vm._v("Status: Active")]):_c('div',[_vm._v("Status: Inactive")])]):_c('div',{staticClass:"status"},[_c('div',[_vm._v("Status: Unknown")])]),_vm._v(" "),_c('div',{staticClass:"time"},[(_vm.starts_in >= 0)?_c('div',[_vm._v("Starts in: "+_vm._s(_vm.starts_in)+" days")]):_vm._e(),_vm._v(" "),(_vm.starts_in < 0)?_c('div',[_vm._v("Ends in: "+_vm._s(_vm.ends_in)+" days")]):_vm._e()]),_vm._v(" "),_c('div',{staticClass:"funding"},[(_vm.current_in_USD)?_c('div',[_vm._v("\n        Funds: "),_c('a',{attrs:{"href":'https://workers.bitshares.foundation/' + _vm.worker.name,"target":"_blank"}},[_vm._v(_vm._s(Math.round(_vm.current_in_USD.float).toLocaleString())+" / "+_vm._s(Math.round(_vm.asked_in_USD.float).toLocaleString())+" (USD)")])]):_c('div',[_vm._v("\n        Funds: "),_c('a',{attrs:{"href":'http://bitshares-explorer.io/#/accounts/' + _vm.worker.worker_account,"target":"_blank"}},[_vm._v(_vm._s(_vm.worker.worker_account))])])]),_vm._v(" "),_c('div',{staticClass:"votes"},[_vm._v("\n    Votes: "+_vm._s(Math.round(_vm.worker.total_votes_for / 100000).toLocaleString())+" BTS\n  ")]),_vm._v(" "),(_vm.votingObject != null)?_c('div',{staticClass:"voting"},[(!!_vm.votingObject.failed)?_c('div',{staticClass:"done"},[_vm._v("Voting failed")]):_vm._e(),_vm._v(" "),(_vm.votingObject.voted || _vm.voted)?_c('div',{staticClass:"done"},[_vm._v("Voted ✔")]):[(_vm.beetFound)?_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")]):[_c('div',{staticClass:"label"},[_vm._v("Beet was not found")]),_vm._v(" "),_c('button',{staticClass:"button",on:{"click":function($event){_vm.goToBeet()}}},[_vm._v("Install now")])]]],2):_vm._e()]):_vm._e()}
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-3e9ce0fa","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWorker.vue
+var BitSharesWorker_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (!_vm.loading)?_c('div',{staticClass:"worker"},[_c('h3',[_vm._v("Worker: "+_vm._s(_vm.votingObject.id)+" - "+_vm._s(_vm.votingObject.title))]),_vm._v(" "),(_vm.receives)?_c('div',{staticClass:"status"},[(_vm.receives.daily.float > 0)?_c('div',[_vm._v("Status: Active")]):_c('div',[_vm._v("Status: Inactive")])]):_c('div',{staticClass:"status"},[_c('div',[_vm._v("Status: Unknown")])]),_vm._v(" "),_c('div',{staticClass:"time"},[(_vm.starts_in >= 0)?_c('div',[_vm._v("Starts in: "+_vm._s(_vm.starts_in)+" days")]):_vm._e(),_vm._v(" "),(_vm.starts_in < 0)?_c('div',[_vm._v("Ends in: "+_vm._s(_vm.ends_in)+" days")]):_vm._e()]),_vm._v(" "),_c('div',{staticClass:"funding"},[(_vm.current_in_USD)?_c('div',[_vm._v("\n        Funds: "),_c('a',{attrs:{"href":'https://workers.bitshares.foundation/' + _vm.votingObject.name,"target":"_blank"}},[_vm._v(_vm._s(Math.round(_vm.current_in_USD.float).toLocaleString())+" / "+_vm._s(Math.round(_vm.asked_in_USD.float).toLocaleString())+" (USD)")])]):_c('div',[_vm._v("\n        Funds: "),_c('a',{attrs:{"href":'http://bitshares-explorer.io/#/accounts/' + _vm.votingObject.object.worker_account,"target":"_blank"}},[_vm._v(_vm._s(_vm.votingObject.object.worker_account))])])]),_vm._v(" "),_c('div',{staticClass:"votes"},[_vm._v("\n    Votes: "+_vm._s(Math.round(_vm.votingObject.object.total_votes_for / 100000).toLocaleString())+" BTS\n  ")]),_vm._v(" "),(_vm.votingObject != null)?_c('div',{staticClass:"voting"},[(!!_vm.votingObject.failed)?_c('div',{staticClass:"done"},[_vm._v("Voting failed")]):_vm._e(),_vm._v(" "),(_vm.votingObject.voted)?_c('div',{staticClass:"done"},[_vm._v("Voted ✔")]):[(_vm.beetFound)?_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")]):[_c('div',{staticClass:"label"},[_vm._v("Beet was not found")]),_vm._v(" "),_c('button',{staticClass:"button",on:{"click":function($event){_vm.goToBeet()}}},[_vm._v("Install now")])]]],2):_vm._e()]):_vm._e()}
 var BitSharesWorker_staticRenderFns = []
 var BitSharesWorker_esExports = { render: BitSharesWorker_render, staticRenderFns: BitSharesWorker_staticRenderFns }
 /* harmony default export */ var components_BitSharesWorker = (BitSharesWorker_esExports);
 // CONCATENATED MODULE: ./src/components/BitSharesWorker.vue
 function BitSharesWorker_injectStyle (ssrContext) {
-  __webpack_require__("apWt")
+  __webpack_require__("Qwom")
 }
 var BitSharesWorker_normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -926,9 +1141,6 @@ var BitSharesWorker_Component = BitSharesWorker_normalizeComponent(
 )
 
 /* harmony default export */ var src_components_BitSharesWorker = (BitSharesWorker_Component.exports);
-
-// EXTERNAL MODULE: ./src/components/BCPCopyright.vue
-var BCPCopyright = __webpack_require__("lVzp");
 
 // CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/BitSharesWidgetVoting.vue
 
@@ -959,10 +1171,11 @@ var BCPCopyright = __webpack_require__("lVzp");
 
 
 
+
 /* harmony default export */ var BitSharesWidgetVoting = ({
     name: 'BitSharesWidgetVoting',
     props: ['layout'],
-    extends: src_components_AbstractBitSharesWidgetVoting,
+    extends: src_components_AbstractWidgetResolvingVoting,
     components: {
         BitSharesWorker: src_components_BitSharesWorker,
         BCPCopyright: BCPCopyright["default"]
@@ -975,11 +1188,16 @@ var BCPCopyright = __webpack_require__("lVzp");
             currentTime: this.getFormattedTime(),
 
             // tooltip that is displayed on hover
-            popupMessage: ""
+            popupMessage: "",
+
+            isPopupVisible: false
         };
     },
 
     methods: {
+        showPopup: function showPopup() {
+            this.isPopupVisible = !this.isPopupVisible;
+        },
         /**
          * general information about the blockchain
          * @returns {*}
@@ -1004,31 +1222,27 @@ var BCPCopyright = __webpack_require__("lVzp");
             var currentDate = new Date();
             return currentDate.getHours() + ':' + ('0' + currentDate.getMinutes()).slice(-2);
         },
-        onConnected: function onConnected() {
+        onResolvedIdFromChain: function onResolvedIdFromChain() {
             var _this2 = this;
 
             this.getHeadMessage().then(function (message) {
                 _this2.popupMessage = message;
+                _this2.loadingMessage = null;
             });
         },
-        /**
-         * Loads the next message and displays it, also updates the tooltip
-         */
-        onResolvedVotingProps: function onResolvedVotingProps() {
-            if (!!this.workerIds) {
-                this.loadingMessage = null;
-            }
+        onVotingObjectsUpdate: function onVotingObjectsUpdate() {
+            this.showVotingObject();
         }
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-082453bc","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetVoting.vue
-var BitSharesWidgetVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"widget-voting--tiles"},[(_vm.workerIds)?_c('div',[(_vm.layout == 'tiles')?_c('div',{staticClass:"widget-voting--tiles--title",on:{"click":_vm.showPopup}},[_c('h2',[_vm._v("BitShares Widget for Voting")])]):_vm._e(),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isPopupVisible),expression:"isPopupVisible"}],staticClass:"widget-voting--popup"},[_c('div',{staticClass:"widget-voting--popup--content"},[_c('div',{staticClass:"widget-voting--tiles--popup-message"},[_vm._v(_vm._s(_vm.popupMessage))]),_vm._v(" "),_c('BCPCopyright')],1)]),_vm._v(" "),_c('br'),_vm._v(" "),(_vm.loadingMessage)?_c('div',{staticClass:"widget-voting--tiles--loading-message"},[_vm._v(_vm._s(_vm.loadingMessage))]):_c('div',_vm._l((_vm.workerIds),function(worker){return _c('div',{staticClass:"widget-voting--tiles--tile"},[_c('BitSharesWorker',{attrs:{"workerid":worker}})],1)}))]):_vm._e()])}
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-1b7c537e","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetVoting.vue
+var BitSharesWidgetVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"widget-voting--tiles"},[(_vm.objectIds)?_c('div',[(_vm.layout == 'tiles')?_c('div',{staticClass:"widget-voting--tiles--title",on:{"click":_vm.showPopup}},[_c('h2',[_vm._v("BitShares Widget for Voting")])]):_vm._e(),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isPopupVisible),expression:"isPopupVisible"}],staticClass:"widget-voting--popup"},[_c('div',{staticClass:"widget-voting--popup--content"},[_c('div',{staticClass:"widget-voting--tiles--popup-message"},[_vm._v(_vm._s(_vm.popupMessage))]),_vm._v(" "),_c('BCPCopyright')],1)]),_vm._v(" "),_c('br'),_vm._v(" "),(_vm.loadingMessage)?_c('div',{staticClass:"widget-voting--tiles--loading-message"},[_vm._v(_vm._s(_vm.loadingMessage))]):_c('div',_vm._l((_vm.objectIds),function(object){return _c('div',{staticClass:"widget-voting--tiles--tile"},[_c('BitSharesWorker',{attrs:{"objectid":object}})],1)}))]):_vm._e()])}
 var BitSharesWidgetVoting_staticRenderFns = []
 var BitSharesWidgetVoting_esExports = { render: BitSharesWidgetVoting_render, staticRenderFns: BitSharesWidgetVoting_staticRenderFns }
 /* harmony default export */ var components_BitSharesWidgetVoting = (BitSharesWidgetVoting_esExports);
 // CONCATENATED MODULE: ./src/components/BitSharesWidgetVoting.vue
 function BitSharesWidgetVoting_injectStyle (ssrContext) {
-  __webpack_require__("gWLI")
+  __webpack_require__("BvKm")
 }
 var BitSharesWidgetVoting_normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -1055,131 +1269,8 @@ var BitSharesWidgetVoting_Component = BitSharesWidgetVoting_normalizeComponent(
 
 /* harmony default export */ var src_components_BitSharesWidgetVoting = (BitSharesWidgetVoting_Component.exports);
 
-// CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/components/BitSharesWidgetInlineVoting.vue
-
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-
-
-/* harmony default export */ var BitSharesWidgetInlineVoting = ({
-    name: 'BitSharesWidgetInlineVoting',
-    extends: src_components_AbstractBitSharesWidgetVoting,
-    components: {
-        BCPCopyright: BCPCopyright["default"]
-    },
-    data: function data() {
-        return {
-            text: this.innerHTML, // initialize with given text
-            popUpText: "Loading ...",
-
-            votingObject: null
-        };
-    },
-
-    methods: {
-        showVotingObject: function showVotingObject() {
-            this.text = this.votingObject.text;
-            this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
-            console.log(this.votingObject);
-        },
-
-        onResolvedVotingProps: function onResolvedVotingProps() {
-            var uniqueIdList = null;
-            if (!!this.witnessIds && keys_default()(this.witnessIds).length == 1) {
-                uniqueIdList = this.witnessIds;
-            }
-            if (!!this.workerIds && keys_default()(this.workerIds).length == 1) {
-                if (uniqueIdList != null) {
-                    this.text = "Please do only provide one object type for voting";
-                } else {
-                    uniqueIdList = this.workerIds;
-                }
-            }
-            if (!!this.committeeIds && keys_default()(this.committeeIds).length == 1) {
-                if (uniqueIdList != null) {
-                    this.text = "Please do only provide one object type for voting";
-                } else {
-                    uniqueIdList = this.committeeIds;
-                }
-            }
-            if (uniqueIdList == null) {
-                this.text = "Please provide exactly one object type for voting";
-                this.errored("Initializing failed");
-            }
-            this.votingObject = uniqueIdList[keys_default()(uniqueIdList)[0]];
-        },
-        onResolvedVotingId: function onResolvedVotingId() {
-            this.showVotingObject();
-        }
-    }
-});
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-1bc785fb","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/components/BitSharesWidgetInlineVoting.vue
-var BitSharesWidgetInlineVoting_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('span',{staticClass:"widget-voting--inline"},[_c('div',{staticClass:"widget-voting--inline--text",on:{"click":_vm.showPopup}},[_vm._v(_vm._s(_vm.text))]),_vm._v(" "),_c('div',{directives:[{name:"show",rawName:"v-show",value:(_vm.isPopupVisible),expression:"isPopupVisible"}],staticClass:"widget-voting--popup"},[_c('div',{staticClass:"widget-voting--popup--content"},[_c('div',{staticClass:"title"},[(_vm.votingObject.object != null)?_c('a',{attrs:{"href":'http://bitshares-explorer.io/#/objects/' + _vm.votingObject.object.id,"target":"_blank"}},[_vm._v("\n                    "+_vm._s(_vm.popUpText)+"\n                ")]):[_vm._v("\n                    "+_vm._s(_vm.popUpText)+"\n                ")]],2),_vm._v(" "),(_vm.votingObject != null)?_c('div',{staticClass:"voting"},[(!!_vm.votingObject.failed)?_c('div',{staticClass:"done"},[_vm._v("Voting failed")]):_vm._e(),_vm._v(" "),(_vm.votingObject.voted)?_c('div',{staticClass:"done"},[_vm._v("Voted ✔")]):[(_vm.beetFound)?_c('button',{staticClass:"button",on:{"click":_vm.vote}},[_vm._v("Vote now")]):[_c('div',{staticClass:"label"},[_vm._v("Beet was not found")]),_vm._v(" "),_c('button',{staticClass:"button",on:{"click":function($event){_vm.goToBeet()}}},[_vm._v("Install now")])]]],2):_vm._e(),_vm._v(" "),_c('div',{staticClass:"copyright"},[_c('BCPCopyright')],1)])])])}
-var BitSharesWidgetInlineVoting_staticRenderFns = []
-var BitSharesWidgetInlineVoting_esExports = { render: BitSharesWidgetInlineVoting_render, staticRenderFns: BitSharesWidgetInlineVoting_staticRenderFns }
-/* harmony default export */ var components_BitSharesWidgetInlineVoting = (BitSharesWidgetInlineVoting_esExports);
-// CONCATENATED MODULE: ./src/components/BitSharesWidgetInlineVoting.vue
-function BitSharesWidgetInlineVoting_injectStyle (ssrContext) {
-  __webpack_require__("ajG1")
-}
-var BitSharesWidgetInlineVoting_normalizeComponent = __webpack_require__("VU/8")
-/* script */
-
-
-/* template */
-
-/* template functional */
-var BitSharesWidgetInlineVoting___vue_template_functional__ = false
-/* styles */
-var BitSharesWidgetInlineVoting___vue_styles__ = BitSharesWidgetInlineVoting_injectStyle
-/* scopeId */
-var BitSharesWidgetInlineVoting___vue_scopeId__ = null
-/* moduleIdentifier (server only) */
-var BitSharesWidgetInlineVoting___vue_module_identifier__ = null
-var BitSharesWidgetInlineVoting_Component = BitSharesWidgetInlineVoting_normalizeComponent(
-  BitSharesWidgetInlineVoting,
-  components_BitSharesWidgetInlineVoting,
-  BitSharesWidgetInlineVoting___vue_template_functional__,
-  BitSharesWidgetInlineVoting___vue_styles__,
-  BitSharesWidgetInlineVoting___vue_scopeId__,
-  BitSharesWidgetInlineVoting___vue_module_identifier__
-)
-
-/* harmony default export */ var src_components_BitSharesWidgetInlineVoting = (BitSharesWidgetInlineVoting_Component.exports);
-
 // CONCATENATED MODULE: ./node_modules/babel-loader/lib!./node_modules/vue-loader/lib/selector.js?type=script&index=0!./src/App.vue
+//
 //
 //
 //
@@ -1191,20 +1282,20 @@ var BitSharesWidgetInlineVoting_Component = BitSharesWidgetInlineVoting_normaliz
 
 /* harmony default export */ var App = ({
     name: 'bitshares-widget-voting',
-    props: ['workeridfromdiv', 'witnessidfromdiv', 'layoutfromdiv', 'committeefromdiv', 'innerHTML'],
+    props: ['objectidfromdiv', 'layoutfromdiv', 'innerHTML'],
     components: {
         BitSharesWidgetVoting: src_components_BitSharesWidgetVoting,
         BitSharesWidgetInlineVoting: src_components_BitSharesWidgetInlineVoting
     }
 });
-// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-a7c74092","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/App.vue
-var App_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (_vm.layoutfromdiv == 'inline')?_c('BitSharesWidgetInlineVoting',{attrs:{"workerid":_vm.workeridfromdiv,"witnessid":_vm.witnessidfromdiv,"committeeid":_vm.committeefromdiv,"innerHTML":_vm.innerHTML}}):_c('BitSharesWidgetVoting',{attrs:{"workerid":_vm.workeridfromdiv,"witnessid":_vm.witnessidfromdiv,"layout":_vm.layoutfromdiv}})}
+// CONCATENATED MODULE: ./node_modules/vue-loader/lib/template-compiler?{"id":"data-v-e78f58f2","hasScoped":false,"transformToRequire":{"video":"src","source":"src","img":"src","image":"xlink:href"},"buble":{"transforms":{}}}!./node_modules/vue-loader/lib/selector.js?type=template&index=0!./src/App.vue
+var App_render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return (_vm.layoutfromdiv == 'inline')?_c('BitSharesWidgetInlineVoting',{attrs:{"objectid":_vm.objectidfromdiv,"innerHTML":_vm.innerHTML,"layout":_vm.layoutfromdiv}}):(_vm.layoutfromdiv == 'inline-button')?_c('BitSharesWidgetInlineVoting',{attrs:{"objectid":_vm.objectidfromdiv,"innerHTML":_vm.innerHTML,"layout":_vm.layoutfromdiv}}):_c('BitSharesWidgetVoting',{attrs:{"objectid":_vm.objectidfromdiv,"layout":_vm.layoutfromdiv}})}
 var App_staticRenderFns = []
 var App_esExports = { render: App_render, staticRenderFns: App_staticRenderFns }
 /* harmony default export */ var selectortype_template_index_0_src_App = (App_esExports);
 // CONCATENATED MODULE: ./src/App.vue
 function App_injectStyle (ssrContext) {
-  __webpack_require__("VjmK")
+  __webpack_require__("J/pj")
 }
 var App_normalizeComponent = __webpack_require__("VU/8")
 /* script */
@@ -1243,7 +1334,7 @@ vue_esm["a" /* default */].config.productionTip = false;
  * This renders the Vue app in the HTML element bitshares-widget-voting.
  *
  * The App.vue serves as middleware that can enable routing if required.
- * The pricesfromdiv property is filled with the markets property from
+ * The fromdiv properties are filled with the properties from
  * the div tag in index.html and passed forward, see App.vue
  *
  */
@@ -1261,23 +1352,13 @@ var main__loop = function _loop() {
     if (!!element) {
         new vue_esm["a" /* default */]({
             el: element,
-            template: '<App :workeridfromdiv="workeridfromdiv" :witnessidfromdiv="witnessidfromdiv" :committeefromdiv="committeefromdiv" :layoutfromdiv="layoutfromdiv" :innerHTML="innerHTML" />',
+            template: '<App :objectidfromdiv="objectidfromdiv" :layoutfromdiv="layoutfromdiv" :innerHTML="innerHTML" />',
             components: { App: src_App },
             beforeMount: function beforeMount() {
                 try {
-                    this.workeridfromdiv = this.$el.attributes["workerid"].value;
+                    this.objectidfromdiv = this.$el.attributes["objectid"].value;
                 } catch (err) {
-                    this.workeridfromdiv = "";
-                }
-                try {
-                    this.witnessidfromdiv = this.$el.attributes["witnessid"].value;
-                } catch (err) {
-                    this.witnessidfromdiv = "";
-                }
-                try {
-                    this.committeefromdiv = this.$el.attributes["committeeid"].value;
-                } catch (err) {
-                    this.committeefromdiv = "";
+                    this.objectidfromdiv = "";
                 }
                 try {
                     this.layoutfromdiv = this.$el.attributes["layout"].value;
@@ -1287,7 +1368,6 @@ var main__loop = function _loop() {
                 this.idName = idName;
                 this.innerHTML = this.$el.innerHTML;
             }
-
         });
     }
 };
@@ -7450,28 +7530,35 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 
 /***/ }),
 
-/***/ "VjmK":
+/***/ "Qv8u":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
 
-/***/ "ajG1":
+/***/ "Qwom":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
 
-/***/ "apWt":
+/***/ "Y5F/":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
 
 /***/ }),
 
-/***/ "gWLI":
+/***/ "cCJr":
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+
+/***/ "g1sd":
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
@@ -7514,13 +7601,6 @@ var Component = normalizeComponent(
 
 /* harmony default export */ __webpack_exports__["default"] = (Component.exports);
 
-
-/***/ }),
-
-/***/ "um4m":
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
 
 /***/ }),
 
