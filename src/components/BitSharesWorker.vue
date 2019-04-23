@@ -1,6 +1,6 @@
 <template>
   <div v-if="!loading" class="worker">
-    <h3>Worker: {{votingObject.id}} - {{votingObject.title}}</h3>
+    <h3>{{votingObject.typeAsString}}: {{votingObject.title}}</h3>
     <div v-if="receives" class="status">
       <div v-if="receives.daily.float > 0">Status: Active</div>
       <div v-else>Status: Inactive</div>

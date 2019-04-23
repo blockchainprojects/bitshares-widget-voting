@@ -32,7 +32,7 @@
                         <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
                         <template v-else>
                             <div class="label">Beet was not found</div>
-                            <button @click="goToBeet()" class="button">Install now</button>
+                            <button @click="goToBeet()" class="button">Install Beet</button>
                         </template>
                     </template>
                 </div>
@@ -69,7 +69,11 @@
             },
             showVotingObject() {
                 this.votingObject = Object.assign({}, this.objectIds[Object.keys(this.objectIds)[0]]);
-                this.popUpText = this.votingObject.type + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
+                if (!this.votingObject) {
+                    // todo investigate when that happens
+                    return;
+                }
+                this.popUpText = this.votingObject.typeAsString + " " + this.votingObject.text + " (" + this.votingObject.object.id + ")";
                 if (!!this.votingObject.text) {
                     this.text = this.votingObject.text;
                 }

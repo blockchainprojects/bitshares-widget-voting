@@ -82,7 +82,6 @@
                 });
             },
             onVotingObjectsUpdate: function() {
-                this.showVotingObject();
             }
         }
     }

@@ -42,7 +42,8 @@
                     this.objectid.split(";").forEach((item) => {
                         this.objectIds[item] = {
                             "id": item,
-                            "type": item.split(".")[1]
+                            "type": item.split(".")[1],
+                            "typeAsString": ""
                         }
                     });
                 } else if (typeof this.objectid === 'object') {
@@ -74,6 +75,7 @@
                                     thiz.objectIds[chainObject.id].text = accounts[0].name;
                                     thiz.objectIds[chainObject.id].title = accounts[0].name;
                                     thiz.objectIds[chainObject.id].voted = null;
+                                    thiz.objectIds[chainObject.id].typeAsString = "Witness";
                                     resolve();
                                 });
                             });
@@ -88,11 +90,12 @@
                                 thiz.objectIds[chainObject.id].text = chainObject.name;
                                 thiz.objectIds[chainObject.id].title = chainObject.name;
                                 thiz.objectIds[chainObject.id].voted = null;
+                                thiz.objectIds[chainObject.id].typeAsString = "Worker";
                             });
                             resolve();
                         });
                     })
-                } else if (type == "14") {
+                } else if (type == "5") {
                     return new Promise((resolve) => {
                         this.chain.db_exec('get_objects', [ids]).then((chainObjects) => {
                             chainObjects.forEach((chainObject) => {
@@ -102,6 +105,7 @@
                                     thiz.objectIds[chainObject.id].text = accounts[0].name;
                                     thiz.objectIds[chainObject.id].title = accounts[0].name;
                                     thiz.objectIds[chainObject.id].voted = null;
+                                    thiz.objectIds[chainObject.id].typeAsString = "Committee";
                                     resolve();
                                 });
                             });
