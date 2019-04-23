@@ -1,9 +1,9 @@
-require('./lib/beet-js/dist/beet-js')
+import beetjs from '@beetapp/beet-js/src'
 
 class Beet {
 
     constructor() {
-        this._beet = beet;
+        this._beet = beetjs.beet;
         this._buffer = {};
     }
 
@@ -25,9 +25,8 @@ class Beet {
             let _connect = () => {
                 let thiz = this;
                 return new Promise((resolve, reject) => {
-                    thiz._beet.initAndConnect("BitShares Voting Widget", "BTS").then(res => {
-                        res.beet = thiz._beet;
-                        resolve(res);
+                    thiz._beet.get("BitShares Voting Widget", "BTS").then(beetApp => {
+                        resolve(beetApp.BTS);
                     }).catch(reject);
                 });
             };

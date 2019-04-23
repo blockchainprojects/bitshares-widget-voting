@@ -52,30 +52,26 @@
                 let thiz = this;
 
                 this.beet.connect().then(connected => {
-                    if (!!connected) {
-                        thiz._checkIfVoted(connected.account_id, votingObject.voteId).then((voted) => {
-                            if (!voted) {
-                                connected.beet.voteFor(
-                                    {
-                                        id: thiz.votingObject.id
-                                    }
-                                ).then((result) => {
-                                    votingObject.voted = true;
-                                    this.onVotingObjectsUpdate();
-                                }).catch((err) => {
-                                    votingObject.failed = true;
-                                    thiz.errored(err);
-                                });
-                            }
-                        }).catch((err) => {
-                            thiz.errored(err);
-                        });
-                    } else {
-                        this.errored("Connection to Beet could not be established");
-                        this.setBeetInstallationStatus(false);
-                    }
+                    thiz._checkIfVoted(connected.getAccount().id, votingObject.voteId).then((voted) => {
+                        if (!voted) {
+                            connected.voteFor(
+                                {
+                                    id: thiz.votingObject.id
+                                }
+                            ).then((result) => {
+                                votingObject.voted = true;
+                                this.onVotingObjectsUpdate();
+                            }).catch((err) => {
+                                votingObject.failed = true;
+                                thiz.errored(err);
+                            });
+                        }
+                    }).catch((err) => {
+                        thiz.errored(err);
+                    });
                 }).catch((err) => {
                     this.errored(err);
+                    this.setBeetInstallationStatus(false);
                 });
             },
             onVotingObjectsUpdate: function() {

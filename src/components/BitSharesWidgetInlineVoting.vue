@@ -5,13 +5,12 @@
         </div>
         <template v-if="layout == 'inline-button'">
             <div class="widget-voting--inline--voting" v-if="votingObject != null">
-                <div v-if="!!votingObject.failed" class="done">Voting failed</div>
-                <div v-if="votingObject.voted" class="done">Voted &#10004;</div>
+                <span v-if="!!votingObject.failed" class="done">Voting failed</span>
+                <span v-if="votingObject.voted" class="done">&#10004;</span>
                 <template v-else>
                     <button v-if="beetFound" class="button" v-on:click="vote">Vote now</button>
                     <template v-else>
-                        <div class="label">Beet was not found</div>
-                        <button @click="goToBeet()" class="button">Install now</button>
+                        <button @click="goToBeet()" class="button">Install Beet</button>
                     </template>
                 </template>
             </div>
